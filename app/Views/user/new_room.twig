@@ -1,0 +1,65 @@
+{% set css_file = 'new_room' %}
+{% include 'user/header.twig' %}
+
+{% block title %}Trang phòng trọ mới{% endblock %}
+
+
+{% block content %}
+    <!-- Nav -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <!-- Toggle button for mobile view -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered" aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarCentered">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/type_room">Loại phòng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" style="color: #e0bf7b; border-bottom: 3px solid #e0bf7b">Phòng mới</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/service">Dịch vụ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Nội dung chính -->
+    <main>
+        <div id="content" class="container mt-3">
+            <div aria-label="breadcrumb" class="page-title">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/home">TRANG CHỦ</a></li>
+                    <li class="breadcrumb-item"><a href="/watch">PHÒNG TRỌ</a></li>
+                    <li class="breadcrumb-item dark" aria-current="page">PHÒNG TRỌ MỚI</li>
+                </ol>
+            </div>
+        
+            <h1>TOP 3 PHÒNG TRỌ MỚI NHẤT</h1>
+            <div class="row mt-5">
+                {% for room in rooms %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card" onclick="window.location.href='/sanpham/{{ room.id }}'">
+                            <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}" class="card-img-top" alt="{{ room.name | e }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ room.name }}</h5>
+                                <p class="card-text">{{ room.type_room }}</p>
+                                <p class="card-text">Giá: {{ room.price|number_format(0, ',', '.') }} đ</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% include 'user/footer.twig' %}

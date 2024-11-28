@@ -1,0 +1,99 @@
+{% set title = "Giỏ hàng" %}
+{% set css_file = "giohang" %}
+{% include 'user/header.twig' %}
+
+<!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered"
+            aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/type_room">Thiết bị</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/service">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main>
+    {% if rooms is empty %}
+        <p>{{ message ?? 'Chưa có sản phẩm nào trong giỏ hàng' }}</p>
+        <a href="/watch" class="button-home d-flex justify-content-center">
+            <span>XEM DANH SÁCH PHÒNG TRỌ HIỆN CÓ</span>
+        </a>
+    {% else %}
+        <h1>GIỎ HÀNG</h1>
+
+        <table class="table table-striped table-bordered table-hover table-sm table-responsive thead-dark">
+            <thead>
+                <tr>
+                    <th>Tên phòng</th>
+                    <th>Giá thuê</th>
+                    <th>Dịch vụ</th>
+                    <th>Tổng giá</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for roomId, room in rooms %}
+                    <tr>
+                        <td>{{ room.name | e }}</td>
+                        <td>{{ room.price | number_format(0, ',', '.') }} đ</td>
+                        <td>
+                            <!-- Hiển thị các dịch vụ đã chọn cho phòng -->
+                            {% if room.services is not empty %}
+                                <ul class="list-group">
+                                    {% for service in room.services %}
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>{{ service.name }}</span>
+                                            <span>{{ service.price | number_format(0, ',', '.') }} đ</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Không có dịch vụ.</p>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set roomTotalPrice = room.price %}
+                            {% if room.services is not empty %}
+                                {% for service in room.services %}
+                                    {% set roomTotalPrice = roomTotalPrice + service.price %}
+                                {% endfor %}
+                            {% endif %}
+                            {{ roomTotalPrice | number_format(0, ',', '.') }} đ
+                        </td>
+                        <td>
+                            <form action="/giohang/remove" method="POST" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="id_room" value="{{ roomId }}">
+                                <button type="submit" name="xoa" class="btn btn-danger btn-sm">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="thanhtoan">
+            <h4>TỔNG CỘNG: {{ totalPrice | number_format(0, ',', '.') }} đ</h4>
+            <a href="/thanhtoan" class="btn btn-primary">Thanh toán</a>
+        </div>
+    {% endif %}
+</main>
+
+{% include 'user/footer.twig' %}
+</body>
+</html>

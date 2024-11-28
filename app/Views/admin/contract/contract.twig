@@ -1,0 +1,238 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+
+<div class="mt-5 container" style="max-width: 1400px;">
+    <div class="d-flex justify-content-between">
+        <h1>Quản lí hợp đồng thuê phòng</h1>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-8 offset-2">
+            <div class="input-group">
+                <div class="input-group-btn search-panel">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <span id="search_concept">Filter by</span> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a class="dropdown-item filter" data-filter="PENDING">Pending</a></li>
+                        <li><a class="dropdown-item filter" data-filter="PROCESSING">Processing</a></li>
+                        <li><a class="dropdown-item filter" data-filter="DONE">Done</a></li>
+                        <li><a class="dropdown-item filter" data-filter="CANCELLED">Cancelled</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item filter" data-filter="anything">Anything</a></li>
+                    </ul>
+                </div>
+                <input type="text" id="search-bar" class="form-control" placeholder="Search term...">
+                <button class="btn btn-outline-secondary" type="button" id="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-search" viewBox="0 0 16 16">
+                        <path
+                            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-hover my-3">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Tenant</th>
+                <th scope="col">Room</th>
+                <th scope="col">Start</th>
+                <th scope="col">End</th>
+                <th scope="col">Total</th>
+                <th scope="col">Deposit</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts %}
+            <tr>
+                <th scope="row">{{ contract.id }}</th>
+                <td>{{ contract.tenant_email }}</td>
+                <td>{{ contract.room_name }}</td>
+
+                <td>{{ contract.start_date }}</td>
+                <td>{{ contract.end_date }}</td>
+                <td>{{ contract.total_amount }} VND</td>
+                <td>{{ contract.deposit }} VND</td>
+                <td>
+                    {% if contract.status == 'PENDING' %}
+                        <form action="/admin/contract/update-status" method="post" class="d-inline-block">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                            <input type="hidden" name="status" value="CANCELLED">
+                            <button type="submit" class="btn btn-danger">Cancel</button>
+                        </form>
+                        <form action="/admin/contract/update-status" method="post" class="d-inline-block">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                            <input type="hidden" name="status" value="PROCESSING">
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                    {% elseif contract.status == 'PROCESSING' %}
+                        <form action="/admin/contract/update-status" method="post" class="d-inline-block">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                            <input type="hidden" name="status" value="PENDING">
+                            <button type="submit" class="btn btn-warning">Reject</button>
+                        </form>
+                        <form action="/admin/contract/update-status" method="post" class="d-inline-block">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                            <input type="hidden" name="status" value="CANCELLED">
+                            <button type="submit" class="btn btn-danger">Cancel</button>
+                        </form>
+                        <form action="/admin/contract/update-status" method="post" class="d-inline-block">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                            <input type="hidden" name="status" value="DONE">
+                            <button type="submit" class="btn btn-success">Contract Success</button>
+                        </form>
+                    {% elseif contract.status == 'CANCELLED' %}
+                        <span class="badge bg-danger">Cancelled</span>
+                    {% elseif contract.status == 'DONE' %}
+                        <span class="badge bg-success">Done</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="btn btn-secondary" href="/admin/contract/detail?id={{ contract.id }}">Detail</a>
+                    <button class="btn btn-danger delete-contract" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                        data-contract-id="{{ contract.id }}">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-center gap-4">
+            <div>
+                <ul class="pagination d-flex justify-content-center">
+                    <li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page in paginator.pages %}
+                    <li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+                        <a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <input type="number" class="form-control page-input" placeholder="Enter page number">
+                    <button class="btn btn-outline-secondary page" type="button">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- Modal for deletion -->
+<div class="modal fade" tabindex="-1" id="exampleModal" aria-labelledby="exampleModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="deleteForm" action="/admin/contract/delete" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this contract?</p>
+                    <input type="hidden" name="contract_id" id="modal-contract-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modalElement = document.getElementById('exampleModal');
+    const modal = new bootstrap.Modal(modalElement);
+    const btn_deletecontract = document.querySelectorAll(".delete-contract");
+    btn_deletecontract.forEach(button => {
+        button.addEventListener('click', () => {
+            const contractId = button.getAttribute('data-contract-id');
+            document.getElementById('modal-contract-id').value = contractId;
+        });
+    });
+
+    // Search and filtering logic
+    const getSearchValue = () => {
+        return document.getElementById('search-bar').value;
+    };
+
+    const searchButton = document.getElementById('search-button');
+    searchButton.addEventListener('click', () => {
+        let fullLink = window.location.href;
+        const url = new URL(fullLink);
+        if (getSearchValue() === '' || getSearchValue() === null) {
+            url.searchParams.delete('search');
+            window.location.href = url;
+        } else {
+            url.searchParams.set('search', getSearchValue());
+            window.location.href = url;
+        }
+    });
+
+    const dropdown = document.querySelectorAll(".filter");
+    dropdown.forEach((item) => {
+        item.addEventListener('click', (e) => {
+            let fullLink = window.location.href;
+            const url = new URL(fullLink);
+            if (item.getAttribute('data-filter') === 'anything') {
+                url.searchParams.delete('filterBy');
+                window.location.href = url;
+            } else {
+                url.searchParams.set('filterBy', (item.getAttribute('data-filter')));
+                window.location.href = url;
+            }
+        });
+    });
+
+    const pageButton = document.querySelector('.page');
+    const pageInput = document.querySelector('.page-input');
+    pageButton.addEventListener('click', () => {
+        let fullLink = window.location.href;
+        const url = new URL(fullLink);
+        let pageNum = pageInput.value;
+        if (pageNum < 0 || pageNum === '' || pageNum === null || pageNum === ' ') {
+            pageNum = 1;
+        }
+        url.searchParams.set('page', pageNum);
+        window.location.href = url;
+    });
+
+    // Automatically add page and search params to input
+    let fullLink = window.location.href;
+    let url = new URL(fullLink);
+    if (url.searchParams.has('page')) {
+        let pageValue = url.searchParams.get('page');
+        pageInput.value = pageValue;
+    }
+    if (url.searchParams.has('search')) {
+        let searchValue = url.searchParams.get('search');
+        document.getElementById('search-bar').value = searchValue;
+    }
+</script>
+
+{% endblock %}

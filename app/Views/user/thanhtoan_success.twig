@@ -1,0 +1,13 @@
+{% set title = "Thanh toán" %}
+{% set css_file = "thanhtoan_success" %} {# Chỉ định file CSS cho trang này #}
+{% include 'user/header.twig' %}
+
+<main style="padding-top: 30px; padding-bottom: 30px; margin-top: 160px; min-height: 300px; text-align: center;">
+    <h1>CÁM ƠN BẠN ĐÃ ĐẶT PHÒNG</h1>
+    {% if message is not empty %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <a href="/home" class="btn btn-primary">Trở về trang chủ</a>
+</main>
+
+{# {% include 'user/footer.twig' %} #}

@@ -1,0 +1,19 @@
+main {
+    min-height: 600px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-top: 160px;
+}
+
+#content {
+    text-align: center;
+}
+
+#content img {
+    max-width: 200px;
+    min-height: 200px;
+}
+
+.phantu {
+    min-height: 200px;
+}

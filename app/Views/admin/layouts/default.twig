@@ -1,0 +1,189 @@
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>
+		Quản lí phòng trọ
+	</title>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+		integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+		crossorigin="anonymous"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+	<link href="/assets/css/sitebar.css" rel="stylesheet" />
+	<script src="/assets/js/sitebar.js" defer></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+	<div class="wrapper">
+		<aside id="sidebar">
+			<div class="d-flex">
+				<button class="toggle-btn" type="button">
+					<i class="bi bi-grid-fill"></i>
+				</button>
+				<div class="sidebar-logo">
+					<a href="#">
+						Admin
+					</a>
+				</div>
+			</div>
+			<ul class="sidebar-nav">
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\dashboard" class="sidebar-link">
+						<i class="bi bi-speedometer"></i>
+						<span>
+							Trang chủ
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\user" class="sidebar-link">
+						<i class="bi bi-person"></i>
+						<span>
+							Quản lí người dùng
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\tenant" class="sidebar-link">
+						<i class="bi bi-person-fill"></i>
+						<span>
+							Quản lí khách thuê
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\room" class="sidebar-link">
+						<i class="bi bi-house-door"></i>
+						<span>
+							Quản lí phòng trọ
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\type_room" class="sidebar-link">
+						<i class="bi bi-house-gear-fill"></i>
+						<span>
+							Quản lí loại phòng
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\service" class="sidebar-link">
+						<i class="bi bi-wrench-adjustable"></i>
+						<span>
+							Quản lí dịch vụ
+						</span>
+					</a>
+				</li>
+				<li class="sidebar-item">
+					<a href="{{ appUrl }}\admin\contract" class="sidebar-link">
+						<i class="bi bi-bag-check-fill position-relative">
+							<span style="font-size: 10px;"
+								class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+								{{pendingcontracts}}
+								<span class="visually-hidden">
+									unread messages
+								</span>
+							</span>
+						</i>
+						<span>
+							Quản lí hợp đồng
+						</span>
+					</a>
+				</li>
+		</aside>
+		<div class="main">
+			<div class="d-flex justify-content-end w-100 shadow-lg p-3 dropdown">
+		
+				<div class="d-flex align-items-center">
+					<!-- Thời gian hiện tại -->
+					<p id="current-time" class="me-3 mb-0"></p>
+		
+					<p class="mb-0" style="margin-right: 5px;">
+						Xin chào {{user.name}}
+					</p>
+		
+					<!-- Avatar và Dropdown -->
+					<img id="dropdownMenuButton1" data-bs-toggle="dropdown" src="/assets/uploads/avatars/{{user.avatar ? user.avatar  : 'avatar.png' }}" alt="Avatar"
+						class="avatar">
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+						<li>
+							<a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+								class="dropdown-item">
+								Đăng xuất
+							</a>
+							<form id="logout-form" class="d-none" action="/logout" method="POST">
+								<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+			{% block page %}{% endblock %}
+		</div>
+		
+</body>
+{% if status %}
+<script>
+	Toastify({
+		text: "{{ status }}",
+		className: "info",
+		duration: 3000,
+		close: true,
+		gravity: "top", // `top` or `bottom`
+		position: "right",
+		style: {
+			background: "linear-gradient(to right, #00b09b, #96c93d)"
+		}
+	}).showToast();
+</script>
+{% endif %}
+
+<script src="/assets/js/previewImgae.js" defer></script>
+<script>
+    function updateTime() {
+        const currentTimeElement = document.getElementById('current-time');
+        const currentDate = new Date();
+
+        // Lấy thông tin ngày, tháng, năm
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Lưu ý: tháng bắt đầu từ 0
+        const year = currentDate.getFullYear();
+
+        // Lấy thông tin giờ, phút, giây
+        const hours = String(currentDate.getHours()).padStart(2, '0');
+        const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+        const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+        // Lấy múi giờ
+        const timeZoneOffset = currentDate.getTimezoneOffset();
+        const sign = timeZoneOffset > 0 ? "-" : "+";
+        const absOffset = Math.abs(timeZoneOffset) / 60;
+        const timeZone = `GMT${sign}${String(absOffset).padStart(2, '0')}`;
+
+        // Định dạng thời gian: "Ngày/tháng/năm - Giờ:Phút:Giây Múi giờ"
+        const formattedTime = `${day}/${month}/${year} - ${hours}:${minutes}:${seconds} ${timeZone}`;
+
+        // Cập nhật vào phần tử thời gian
+        currentTimeElement.textContent = formattedTime;
+    }
+
+    // Cập nhật thời gian mỗi giây
+    setInterval(updateTime, 1000);
+
+    // Gọi hàm ngay khi trang được tải
+    updateTime();
+</script>
+
+</html>
+</body>
+
+</html>

@@ -1,0 +1,270 @@
+main {
+    margin-top: 160px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.page-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.breadcrumb-item {
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    font-weight: normal;
+}
+
+.breadcrumb-item > a {
+    text-decoration: none;
+    color: rgba(102, 102, 102, 0.7);
+    
+}
+
+.body-sanpham {
+    text-align: center;
+
+}
+
+.body-sanpham h2 {
+    color: #e0bf7b;
+}
+
+.body-sanpham p {
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.body-sanpham h6 {
+    color: #000;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.body-sanpham .phone-muahang {
+    text-decoration: none;
+    color: #e0bf7b;
+    padding: 10px 15px;
+    border: 2px solid #e0bf7b;
+}
+
+.body-sanpham .phone-muahang:hover {
+    color: #fff;
+    background-color: #e0bf7b;
+}
+
+.form-container {
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+
+.btn-sanpham {
+    padding: 5px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #916841;
+    color: white;
+    border: 1px solid #916841;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+}
+
+.btn-sanpham:hover {
+    opacity: 0.7;
+}
+
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: none;
+}
+
+.btn-quantity {
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ccc;
+    border: 1px solid #ddd;
+}
+
+.btn-quantity:hover {
+    background-color: #bbb;
+}
+
+.contact-mxh {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-mxh li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.contact-mxh li a {
+    display: inline-block;
+    border-radius: 50% 50%;
+    border: 1px solid #e0bf7b;
+    text-align: center;
+    color: #e0bf7b;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+}
+
+.type_room-sanpham a {
+    color: #000;
+    text-decoration: none;
+
+}
+
+.type_room-sanpham a:hover {
+    color: #e0bf7b;
+    
+}
+
+.social-icon a {
+    text-decoration: none;
+    color: #686868;
+    margin-right: 3px;
+}
+
+.carousel-inner img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+}
+
+.carousel-thumbnails {
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
+.carousel-items {
+    width: 450px;
+    height: auto;
+}
+
+.carousel-thumbnails img {
+    width: 50%;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.carousel-thumbnails img:hover {
+    border: 2px solid #007bff;
+}
+
+/* Ẩn các phần nội dung */
+.tab-content {
+    display: none;
+}
+
+/* Hiển thị phần nội dung khi được chọn */
+.tab-content.active {
+    display: block;
+}
+
+/* Các nút tab */
+.tabs {
+    list-style: none;
+    padding: 0;
+}
+
+.tabs .tab {
+    cursor: pointer;
+    padding: 10px;
+    margin: 0;
+    
+    display: inline-block;
+}
+
+.tabs .tab:hover {
+    font-weight: bold;
+    border-top: 5px solid #e0bf7b;
+}
+
+.tabs .tab.active {
+    font-weight: bold;
+    border-top: 5px solid #e0bf7b;
+}
+
+#reviews {
+    /* text-align: center; */
+    width: 1000px;
+}
+
+#reviews h3 {
+    font-weight: bold;
+}
+
+#reviews .star-box {
+    margin-top: 10px;
+    border: 2px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    max-width: 1000px;
+}
+
+#reviews .star-box-left {
+    width: 70%;
+}
+
+#reviews .review-row i {
+    color: rgb(234, 234, 17);
+}
+
+.star-box-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.review-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; 
+    margin-top: 10px;
+}
+
+.review-row span {
+    display: inline-block; 
+    font-size: 18px;
+}
+
+.progress {
+    flex-grow: 1; 
+    margin-left: 10px; 
+    margin-right: 10px;
+}
+
+.star-box-right {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.review-now {
+    background-color: #916841;
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #fff;
+    display: inline-block;
+}
+
+.cost-sanpham {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#description p {
+    text-align: justify;
+}

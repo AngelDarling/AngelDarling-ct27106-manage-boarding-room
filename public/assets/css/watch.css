@@ -1,0 +1,93 @@
+main {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-top: 160px;
+    min-height: 300px;
+}
+
+.page-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.breadcrumb-item {
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    font-weight: normal;
+}
+
+.breadcrumb-item > a {
+    text-decoration: none;
+    color: rgba(102, 102, 102, 0.7);
+    
+}
+
+#content .card {
+    margin-bottom: 30px;
+    border: none;
+}
+
+#content .card-body {
+    text-align: center;
+}
+
+#content .card-text {
+    font-weight: bold;
+    pointer-events: none;
+}
+
+#content .card img {
+    max-height: 250px;
+}
+
+#content .card-title:hover, p:hover {
+    color: #e0bf7b;
+    cursor: pointer;
+}
+
+.form-control {
+    border: 2px solid #000;
+}
+
+#pagination {
+    text-align: center;
+}
+
+#pagination button {
+    margin: 0 10px;
+}
+
+#paginationStatus {
+    font-size: 16px;
+    margin: 0 10px;
+}
+
+.thongbao {
+    margin-top: 30px;
+    font-size: 20px;
+    text-align: center;
+}
+.thongbao:hover {
+    color: #212529;
+    cursor:auto;
+}
+
+.button-home {
+    text-decoration: none;
+}
+
+.button-home span {
+    padding: 5px 25px;
+    border: #e0bf7b 4px solid;
+    color: #e0bf7b; 
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.button-home span:hover {
+    background-color: #e0bf7b;
+    color: #fff;
+}

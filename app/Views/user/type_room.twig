@@ -1,0 +1,57 @@
+{% set css_file = 'type_room' %}
+{% include 'user/header.twig' %}
+
+{% set title = "Trang loại phòng" %}
+
+
+{% block content %}
+<!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered"
+            aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" style="color: #e0bf7b; border-bottom: 3px solid #e0bf7b">Loại phòng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/service">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Nội dung chính -->
+<main>
+    <div id="content" class="container mt-3">
+        <h3>CÁC LOẠI PHÒNG</h3>
+        <div class="row">
+            {% for type_room in type_rooms %}
+            <div class="phantu col-6 col-md-3 text-center mb-4">
+                <a href="/watch/{{ type_room.id }}">
+                    <img src="/assets/uploads/type_rooms/{{ type_room.image ? type_room.image | e : 'type_room.jpg' }}"
+                        alt="{{ type_room.name | e }}">
+                </a>
+                <span style="font-size: 20px; font-weight: bolt; display: block; margin-top: 10px;">{{ type_room.name }}</span>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% include 'user/footer.twig' %}

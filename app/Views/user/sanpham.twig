@@ -1,0 +1,305 @@
+{% set title = "Trang thương hiệu" %}
+{% set css_file = "sanpham" %} {# Chỉ định file CSS cho trang này #}
+{% include 'user/header.twig' %}
+
+<!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered"
+            aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/type_room">Loại phòng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/service">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Nội dung chính -->
+<main>
+    <div id="content" class="container mt-3">
+        <div aria-label="breadcrumb" class="page-title">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/home">TRANG CHỦ</a></li>
+                <li class="breadcrumb-item"><a href="/watch">PHÒNG TRỌ</a></li>
+                <li class="breadcrumb-item"><a href="/new_room">PHÒNG TRỌ MỚI</a></li>
+                <li class="breadcrumb-item dark" aria-current="page">CHI TIẾT PHÒNG TRỌ</a></li>
+            </ol>
+        </div>
+
+        <div class="row mt-5 body-sanpham">
+            <div class="col-md-2 carousel-thumbnails">
+                <!-- Thumbnail Images -->
+                <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}"
+                    class="img-thumbnail" data-bs-target="#carouselExample" data-bs-slide-to="0">
+                <img src="/assets/img/phongtro-chitiet/phong-tro-dep-13_1615737265.jpg" class="img-thumbnail"
+                    data-bs-target="#carouselExample" data-bs-slide-to="1">
+                <img src="/assets/img/phongtro-chitiet/phong-tro-dep-15_1615737304.jpg" class="img-thumbnail"
+                    data-bs-target="#carouselExample" data-bs-slide-to="2">
+                <img src="/assets/img/phongtro-chitiet/phong-tro-dep-16_1615737324.jpg" class="img-thumbnail"
+                    data-bs-target="#carouselExample" data-bs-slide-to="3">
+                <img src="/assets/img/phongtro-chitiet/phong-tro-dep-18_1615737372.jpg" class="img-thumbnail"
+                    data-bs-target="#carouselExample" data-bs-slide-to="4">
+            </div>
+            <div class="col-md-5">
+                <!-- Main Carousel -->
+                <div id="carouselExample" class="carousel slide">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}"
+                                class="img-thumbnail" data-bs-target="#carouselExample" data-bs-slide-to="0">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/assets/img/phongtro-chitiet/phong-tro-dep-13_1615737265.jpg"
+                                class="d-block w-100" alt="room Image 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/assets/img/phongtro-chitiet/phong-tro-dep-15_1615737304.jpg"
+                                class="d-block w-100" alt="room Image 3">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/assets/img/phongtro-chitiet/phong-tro-dep-16_1615737324.jpg"
+                                class="d-block w-100" alt="room Image 4">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/assets/img/phongtro-chitiet/phong-tro-dep-18_1615737372.jpg"
+                                class="d-block w-100" alt="room Image 5">
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h2>{{ room.name|e }}</h2>
+                <span class="cost-sanpham">{{ room.price|number_format(0, ',', '.') }} đ</span>
+                <div class="form-container">
+                    {% if room.status == 'Còn trống' %}
+                        {% if isCartEmpty%}
+                            <!-- Chỉ hiển thị nút Đặt phòng nếu giỏ hàng trống -->
+                            <form action="/giohang/add" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="id_room" value="{{ room.id|e }}">
+                                <h5>Chọn dịch vụ (nếu có):</h5>
+                                <div>
+                                    {% for service in services %}
+                                        <label>
+                                            <input type="checkbox" name="services[]" value="{{ service.id }}">
+                                            {{ service.name }} - {{ service.price|number_format(0, ',', '.') }} đ
+                                        </label><br>
+                                    {% endfor %}
+                                </div>
+                                <button type="submit" name="themgiohang" class="btn-sanpham">Đặt phòng</button>
+                            </form>
+                        {% else %}
+                            <!-- Hiển thị thông báo nếu giỏ hàng đã có sản phẩm -->
+                            <div class="alert alert-warning mt-3">
+                                <strong>Cảnh báo!</strong> Giỏ hàng của bạn đã có sản phẩm. Bạn không thể đặt thêm phòng lúc này.
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-warning mt-3">
+                            Phòng này đã có người đặt. Xin vui lòng tham khảo phòng khác.
+                        </div>
+                    {% endif %}
+                </div>
+                <h6>GỌI ĐỂ ĐẶT PHÒNG</h6>
+                <a href="tel:0123456789" class="phone-muahang"><span>012 3456 789</span></a>
+                <h6>NHẮN TIN/MẠNG XÃ HỘI</h6>
+                <ul class="contact-mxh">
+                    <li><a href="tel:0123456789"><i class="fa-solid fa-phone-volume"></i></a></li>
+                    <li><a href=""><i class="fa-solid fa-message"></i></a></li>
+                    <li><a href=""><i class="fa-solid fa-square-phone-flip"></i></a></li>
+                    <li><a href=""><i class="fa-solid fa-info"></i></a></li>
+                    <li><a href=""><i class="fa-solid fa-image"></i></a></li>
+                    <li><a href=""><i class="fa-solid fa-person"></i></a></li>
+                </ul>
+                <p>Hãy nhắn tin trực tiếp hoặc kết nối qua các kênh mạng xã hội để được tư vấn thêm</p>
+                <div class="type_room-sanpham">
+                    <span>Loại phòng hiện tại: </span>
+                    <a href="#">{{ room.type_room|e }}</a>
+                </div>
+                <div class="social-icon">
+                    <a href=""><i class="ti-facebook"></i></a>
+                    <a href=""><i class="ti-twitter"></i></a>
+                    <a href=""><i class="ti-email"></i></a>
+                    <a href=""><i class="ti-pinterest"></i></a>
+                    <a href=""><i class="ti-linkedin"></i></a>
+                    <a href=""><i class="ti-tumblr"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <ul class="tabs">
+                <li class="tab active" data-target="description">MÔ TẢ</li>
+                <li class="tab" data-target="reviews">ĐÁNH GIÁ (0)</li>
+            </ul>
+            <div class="content d-flex justify-content-center">
+                <div id="description" class="tab-content">
+                    <p>{{ room.long_description|e }}</p>
+                    <table class="table" style="width: 650px">
+                        <tbody>
+                            <tr>
+                                <td>Loại phòng</td>
+                                <td>Phòng đơn, Phòng đôi</td>
+                            </tr>
+                            <tr>
+                                <td>Diện tích</td>
+                                <td>20m² - 35m²</td>
+                            </tr>
+                            <tr>
+                                <td>Tiện nghi</td>
+                                <td>Giường, Tủ quần áo, Bàn làm việc, Điều hòa</td>
+                            </tr>
+                            <tr>
+                                <td>Wi-Fi</td>
+                                <td>Miễn phí</td>
+                            </tr>
+                            <tr>
+                                <td>Dịch vụ dọn phòng</td>
+                                <td>Định kỳ 2 lần/tuần</td>
+                            </tr>
+                            <tr>
+                                <td>Giá thuê</td>
+                                <td>2.000.000 VND/tháng</td>
+                            </tr>
+                            <tr>
+                                <td>Đặt cọc</td>
+                                <td>1 tháng tiền thuê</td>
+                            </tr>
+                            <tr>
+                                <td>Tiện ích khác</td>
+                                <td>Giặt là, Bãi đậu xe</td>
+                            </tr>
+                            <tr>
+                                <td>Khả năng cách âm</td>
+                                <td>Tốt</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="reviews" class="tab-content">
+                    <h3>Đánh giá
+                        {{ room.name|e }}
+                    </h3>
+                    <div class="container star-box">
+                        <div class="star-box-left">
+                            <div class="review-row">
+                                <span>5<i class="fa-solid fa-star"></i></span>
+                                <div class="progress" style="height:20px">
+                                    <div class="progress-bar" style="width:0%;"></div>
+                                </div>
+                                <span><b>0%</b> | 0 đánh giá</span>
+                            </div>
+                            <div class="review-row">
+                                <span>4<i class="fa-solid fa-star"></i></span>
+                                <div class="progress" style="height:20px">
+                                    <div class="progress-bar" style="width:0%;"></div>
+                                </div>
+                                <span><b>0%</b> | 0 đánh giá</span>
+                            </div>
+                            <div class="review-row">
+                                <span>3<i class="fa-solid fa-star"></i></span>
+                                <div class="progress" style="height:20px">
+                                    <div class="progress-bar" style="width:0%;"></div>
+                                </div>
+                                <span><b>0%</b> | 0 đánh giá</span>
+                            </div>
+                            <div class="review-row">
+                                <span>2<i class="fa-solid fa-star"></i></span>
+                                <div class="progress" style="height:20px">
+                                    <div class="progress-bar" style="width:0%;"></div>
+                                </div>
+                                <span><b>0%</b> | 0 đánh giá</span>
+                            </div>
+                            <div class="review-row">
+                                <span>1<i class="fa-solid fa-star"></i></span>
+                                <div class="progress" style="height:20px">
+                                    <div class="progress-bar" style="width:0%;"></div>
+                                </div>
+                                <span><b>0%</b> | 0 đánh giá</span>
+                            </div>
+                        </div>
+                        <div class="star-box-right">
+                            <a href="" title="Đánh giá ngay" class="review-now">Đánh giá ngay</a>
+                        </div>
+                    </div>
+                    <p>Chưa có đánh giá nào.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% include 'user/footer.twig' %}
+
+<script>
+    // Hàm tăng số lượng
+    // function increaseQuantity() {
+    //     var quantityInput = document.getElementById('quantity');
+    //     var currentValue = parseInt(quantityInput.value);
+    //     quantityInput.value = currentValue + 1;
+    // }
+
+    // // Hàm giảm số lượng
+    // function decreaseQuantity() {
+    //     var quantityInput = document.getElementById('quantity');
+    //     var currentValue = parseInt(quantityInput.value);
+    //     if (currentValue > 1) {
+    //         quantityInput.value = currentValue - 1;
+    //     }
+    // }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Xóa lớp 'active' khỏi tất cả các tab và nội dung
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+
+                // Thêm lớp 'active' vào tab và nội dung đã chọn
+                tab.classList.add('active');
+                const targetId = tab.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Mặc định chọn tab đầu tiên
+        tabs[0].click();
+    });
+
+</script>
+</body>
+
+</html>

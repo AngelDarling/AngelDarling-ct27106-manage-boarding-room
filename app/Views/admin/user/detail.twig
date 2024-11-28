@@ -1,0 +1,234 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #dfdfdf;
+        }
+
+        #sidebar {
+            background: #6d6d6d;
+            min-height: 100vh;
+            color: white;
+            transition: all 0.3s;
+            overflow-y: scroll;
+            top: 0;
+            height: 100vh;
+        }
+
+        #sidebar ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        #sidebar .sidebar-header {
+            background: #333333;
+            padding: 20px;
+        }
+
+        #sidebar .active {
+            margin-left: 0;
+            background-color: #7386D5;
+        }
+
+        #sidebar ul li a {
+            display: block;
+            padding: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: white;
+            color: #7386D5;
+        }
+
+        .content {
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Sidebar toggle button on smaller screens */
+        @media (max-width: 992px) {
+            #sidebar {
+                margin-left: -250px;
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+
+            #sidebarCollapse {
+                display: block;
+            }
+        }
+
+        /* Show sidebar and hide button on larger screens */
+        @media (min-width: 992px) {
+            #sidebarCollapse {
+                display: none;
+            }
+
+            #sidebar {
+                margin-left: 0;
+            }
+        }
+
+        .avatar {
+            vertical-align: middle;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper d-flex">
+
+        <nav id="sidebar" class="col-lg-2 col-md-4 position-sticky">
+
+            <div class="sidebar-header" onclick="window.location.replace(`{{appURL}}/admin/user`);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-house"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
+                </svg>
+                <h3>Email user</h3>
+            </div>
+            <ul class="list-unstyled components">
+
+                {% for u in listUser %}
+                <li class="{{ u.id == user.id ? 'active' : '' }}">
+                    <a href="/admin/user/detail?id={{ u.id }}">{{ u.email }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+
+
+        </nav>
+
+        <div class="content flex-grow-1">
+            <nav class="navbar navbar-light">
+                <!-- Sidebar Toggle Button -->
+                <button type="button" id="sidebarCollapse" class="btn btn-info d-lg-none">
+                    <i class="fa fa-align-justify"></i>
+                </button>
+            </nav>
+            <div>
+                <main class="container">
+                    <div class="col-12">
+                        <div class="d-flex gap-5">
+                            <div
+                                class="p-5 col-4 rounded bg-white d-flex justify-content-center align-items-center d-flex flex-column">
+                                <img class="avatar"
+                                    src="/assets/uploads/avatars/{{user.avatar ? user.avatar : 'avatar.png' }}" />
+
+                                <h2 class="d-flex justify-content-center">{{ user.name }}</h2>
+                                <p>{{ user.role }}</p>
+                            </div>
+                            <div class="col-8 rounded bg-white p-3">
+                                <div class="my-3 row">
+                                    <label class="col-sm-2 col-form-label">Name</label>
+                                    <div class="col-sm-10">
+                                        <input readonly type="text" class="form-control-plaintext form-control"
+                                            value="{{ user.name }}">
+                                    </div>
+                                </div>
+                                <div class="my-3 row">
+                                    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="inputEmail"
+                                            value="{{ user.email }}">
+                                    </div>
+                                </div>
+                                <div class="my-3 row">
+                                    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="inputPassword" disabled
+                                            value="Can't access">
+                                    </div>
+                                </div>
+                                <div class="my-3 row">
+                                    <label for="inputGender" class="col-sm-2 col-form-label">Gender</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control form-control-plaintext" id="inputGender"
+                                            value="{{ user.gender }}">
+                                    </div>
+                                </div>
+                                <a class="btn btn-info my-3" href="/admin/user/update?id={{user.id}}">
+                                    Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-3 col-12">
+
+                        <div class="col-12 rounded bg-white p-3">
+                            <div class="d-flex justify-content-between">
+                                <h1>Đã từng đặt phòng</h1>
+                            </div>
+                            <hr />
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tên phòng</th>
+                                        <th scope="col">Giá thuê</th>
+                                        <th scope="col">Mô tả ngắn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if rooms is not empty %}
+                                    {% for room in rooms %}
+                                    <tr>
+                                        <th scope="row">{{ room.name }}</th>
+                                        <td>{{ room.total_amount }} VND</td>
+                                        <td>{{ room.short_description }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">Hiện tại chưa đặt phòng</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            {% if total_amount > 0 %}
+                            <h2>Tổng số tiền trong 1 năm: {{ total_amount }} VND</h2>
+                            {% else %}
+                            <h2>Hiện tại chưa từng đặt phòng</h2>
+                            {% endif %}
+
+
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src=" https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    });
+</script>
+
+</html>

@@ -1,0 +1,177 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<div class="mt-5 container">
+    <div class="d-flex justify-content-between">
+        <h1>Quản lí loại phòng</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Thêm loại phòng mới
+        </button>
+    </div>
+    <hr />
+
+    <table class="table table-hover my-4 text-center">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Tên</th>
+                <th scope="col">Hình ảnh</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        {% for type_room in type_rooms %}
+        <tr>
+            <th scope="row">{{ type_room.id }}</th>
+            <td>{{ type_room.name }}</td>
+            <td><img width="60px" src="/assets/uploads/type_rooms/{{type_room.image ? type_room.image  : 'type_room.jpg' }}" alt="">
+            </td>
+            <td>
+                <a class="btn btn-warning mx-2" href="/admin/type_room/update?id={{ type_room.id }}">Update</a>
+                <button class="btn btn-danger delete-type_room" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                    data-type_roomname="{{ type_room.name }}" data-id="{{ type_room.id }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-center gap-4">
+            <div>
+                <ul class="pagination d-flex justify-content-center">
+                    <li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page in paginator.pages %}
+                    <li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+                        <a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <input type="number" class="form-control page-input" placeholder="Nhập số trang">
+                    <button class="btn btn-outline-secondary page" type="button">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Modal -->
+    <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/admin/type_room/add" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Thêm loại phòng mới</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.name %}is-invalid{% endif %}" id="name"
+                                name="name" placeholder="type_room Name" value="{{ formError.name ?? '' }}" required>
+                            <label for="name">Tên loại phòng</label>
+                            <div class="invalid-feedback">
+                                {{ errors.name }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">Hình ảnh loại phòng</label>
+                            <input accept="image/png, image/gif, image/jpeg" class="form-control file-input" type="file"
+                                id="formFile" name="image">
+                        </div>
+                        <div style="border-style: dashed !important; height: 20vh;"
+                            class="mb-3 w-100 border border-secondary d-flex justify-content-center">
+                            <div class="previewDivImage position-relative"></div>
+                        </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteForm" action="/admin/type_room/delete" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xóa loại phòng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Xóa tên loại phòng: <span id="modal-type_roomname"></span></p>
+                        <input type="hidden" name="type_room_id" id="modal-type_room-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('exampleModal');
+        const modal = new bootstrap.Modal(modalElement);
+        const btn_deletetype_room = document.querySelectorAll(".delete-type_room");
+
+        btn_deletetype_room.forEach(button => {
+            button.addEventListener('click', () => {
+                const type_roomname = button.getAttribute('data-type_roomname');
+                const type_roomId = button.getAttribute('data-id');
+
+                document.getElementById('modal-type_roomname').textContent = type_roomname;
+                document.getElementById('modal-type_room-id').value = type_roomId;
+            });
+        });
+
+        const pageButton = document.querySelector('.page');
+        const pageInput = document.querySelector('.page-input');
+
+        pageButton.addEventListener('click', () => {
+            let fullLink = window.location.href;
+            const url = new URL(fullLink);
+            let pageNum = pageInput.value;
+            if (pageNum < 0 || pageNum === '' || pageNum === null || pageNum === ' ') {
+                pageNum = 1;
+            }
+            url.searchParams.set('page', pageNum);
+            window.location.href = url.href;
+        });
+
+        let fullLink = window.location.href;
+        let url = new URL(fullLink);
+        if (url.searchParams.has('page')) {
+            let pageValue = url.searchParams.get('page');
+            pageInput.value = pageValue;
+        }
+    });
+
+</script>
+{% if isOpenModal %}
+<script>
+
+    const modal1 = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    modal1.show();
+
+</script>
+{% endif %}
+{% endblock %}

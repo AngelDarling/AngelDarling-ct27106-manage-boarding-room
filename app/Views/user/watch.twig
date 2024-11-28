@@ -1,0 +1,221 @@
+{% set title = "Trang thương hiệu" %}
+{% set css_file = "watch" %} {# Chỉ định file CSS cho trang này #}
+{% include 'user/header.twig' %}
+
+
+<!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered"
+            aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/type_room">Loại phòng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/service">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Nội dung chính -->
+<main>
+    {% if rooms is not empty %}
+    <div id="content" class="container mt-3">
+        <div aria-label="breadcrumb" class="page-title">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/home">TRANG CHỦ</a></li>
+                <li class="breadcrumb-item dark" aria-current="page">PHÒNG TRỌ</a></li>
+            </ol>
+            <div class="dropdown">
+                <button type="button" class="btn btn-light dropdown-toggle border" data-bs-toggle="dropdown">
+                    Thứ tự mặc định
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="sortByPrice('asc')">Thứ tự theo giá: thấp đến cao</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="sortByPrice('desc')">Thứ tự theo giá: cao xuống
+                            thấp</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Form tìm kiếm -->
+        <form action="#" method="get">
+            <div class="row mb-4">
+                <div class="col-md-6 offset-md-3 mb-4">
+                    <input type="text" id="roomSearch" class="form-control" placeholder="Tìm kiếm phòng trọ ...">
+                </div>
+            </div>
+        </form>
+
+        <!-- Danh sách sản phẩm -->
+        <div id="roomList" class="row">
+            
+                {% for room in rooms %}
+                <div class="col-md-4 mb-4 room-item" data-name="{{ room.name }}" data-type_room="{{ room.type_room }}"
+                    data-price="{{ room.price }}">
+                    <div class="card" onclick="window.location.href='/sanpham/{{ room.id }}'">
+                        <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}"
+                            class="card-img-top" alt="{{ room.name | e }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ room.name }}</h5>
+                            <p class="card-text">{{ room.type_room }}</p>
+                            <p class="card-text">Giá: {{ room.price|number_format(0, ',', '.') }} đ</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <!-- Phần phân trang -->
+                <div class="col-12 mt-3" id="pagination">
+                    <button id="paginationPrev" class="btn btn-primary">Trang trước</button>
+                    <span id="paginationStatus"></span>
+                    <button id="paginationNext" class="btn btn-primary">Trang tiếp theo</button>
+                </div>
+            {% else %}
+                <p class="thongbao">{{ message ?? 'Loại phòng này hiện không có phòng' }}</p>
+                <a href="/type_room" class="button-home d-flex justify-content-center">
+                    <span>QUAY TRỞ LẠI TRANG LOẠI PHÒNG</span>
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+</main>
+
+<!-- Footer -->
+{% include 'user/footer.twig' %}
+
+<!-- Javascript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+
+    let thisPage = 1;
+    let limit = 6; // Số lượng phòng trọ mỗi trang
+    let roomList = document.querySelectorAll('#roomList .room-item'); // Lấy danh sách các phòng trọ
+
+    // Hàm tải các phòng trọ theo trang
+    function loadItem() {
+        let beginGet = limit * (thisPage - 1);
+        let endGet = limit * thisPage - 1;
+
+        // Ẩn tất cả phòng trọ
+        roomList.forEach((item, key) => {
+            if (key >= beginGet && key <= endGet) {
+                item.style.display = 'block'; // Hiển thị phòng trọ trong phạm vi trang
+            } else {
+                item.style.display = 'none'; // Ẩn các phòng trọ không thuộc trang hiện tại
+            }
+        });
+
+        listPage();
+    }
+
+    // Hàm hiển thị phân trang
+    function listPage() {
+        let count = Math.ceil(roomList.length / limit); // Tính số trang
+        let paginationStatus = document.querySelector('#paginationStatus');
+        paginationStatus.innerHTML = `Trang ${thisPage} / ${count}`; // Cập nhật số trang hiện tại
+
+        // Phần hiển thị nút phân trang "Trang trước" và "Trang tiếp theo"
+        let paginationPrev = document.querySelector('#paginationPrev');
+        let paginationNext = document.querySelector('#paginationNext');
+
+        // Ẩn/hiện nút "Trang trước"
+        if (thisPage > 1) {
+            paginationPrev.style.display = 'inline-block';
+            paginationPrev.setAttribute('onclick', `changePage(${thisPage - 1})`);
+        } else {
+            paginationPrev.style.display = 'none';
+        }
+
+        // Ẩn/hiện nút "Trang tiếp theo"
+        if (thisPage < count) {
+            paginationNext.style.display = 'inline-block';
+            paginationNext.setAttribute('onclick', `changePage(${thisPage + 1})`);
+        } else {
+            paginationNext.style.display = 'none';
+        }
+    }
+
+    // Hàm thay đổi trang
+    function changePage(pageNumber) {
+        thisPage = pageNumber;
+        loadItem();
+    }
+
+    // Tải trang ban đầu
+    loadItem();
+
+    $(document).ready(function () {
+        // Xử lý tìm kiếm phòng trọ
+        $('#roomSearch').on('keyup', function () {
+            var searchTerm = $(this).val().toLowerCase();
+
+            // Lọc các phòng trọ dựa trên tên
+            $('#roomList .room-item').each(function () {
+                var roomName = $(this).data('name').toLowerCase();
+
+                // Kiểm tra nếu có khớp với tìm kiếm
+                if (roomName.includes(searchTerm)) {
+                    $(this).show(); // Hiển thị phòng trọ
+                } else {
+                    $(this).hide(); // Ẩn phòng trọ
+                }
+            });
+
+            // Sau khi tìm kiếm, reset trang về 1
+            thisPage = 1;
+        });
+
+    });
+
+
+    // Hàm sắp xếp phòng trọ theo giá
+    function sortByPrice(order) {
+        let roomItems = Array.from(document.querySelectorAll('#roomList .room-item'));
+
+        // Sắp xếp phòng trọ theo giá
+        roomItems.sort((a, b) => {
+            let priceA = parseFloat(a.dataset.price); // Giá của phòng trọ A
+            let priceB = parseFloat(b.dataset.price); // Giá của phòng trọ B
+
+            if (order === 'asc') {
+                return priceA - priceB; // Sắp xếp theo giá thấp đến cao
+            } else {
+                return priceB - priceA; // Sắp xếp theo giá cao xuống thấp
+            }
+        });
+
+        // Cập nhật lại danh sách phòng trọ trong DOM sau khi sắp xếp
+        let roomList = document.querySelector('#roomList');
+        roomList.innerHTML = '';  // Xóa tất cả phòng trọ hiện tại
+
+        // Thêm lại các phòng trọ theo thứ tự đã sắp xếp
+        roomItems.forEach(room => {
+            roomList.appendChild(room);
+        });
+
+        // Reset trang về 1 khi sắp xếp
+        // thisPage = 1;
+        loadItem();
+    }
+
+</script>
+
+</body>
+
+</html>

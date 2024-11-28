@@ -1,0 +1,188 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<div class="mt-5 container">
+    <div class="d-flex justify-content-between">
+        <h1>Quản lí dịch vụ</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Thêm dịch vụ mới
+        </button>
+    </div>
+    <hr />
+
+    <table class="table table-hover my-4 text-center">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Tên</th>
+                <th scope="col">Giá</th>
+                <th scope="col">Mô tả</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        {% for service in services %}
+        <tr>
+            <th scope="row">{{ service.id }}</th>
+            <td>{{ service.name }}</td>
+            <td>{{ service.price }}</td>
+            <td>{{ service.description }}</td>
+            <td>
+                <a class="btn btn-warning mx-2" href="/admin/service/update?id={{ service.id }}">Update</a>
+                <button class="btn btn-danger delete-service" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                    data-servicename="{{ service.name }}" data-id="{{ service.id }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-center gap-4">
+            <div>
+                <ul class="pagination d-flex justify-content-center">
+                    <li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page in paginator.pages %}
+                    <li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+                        <a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <input type="number" class="form-control page-input" placeholder="Nhập số trang">
+                    <button class="btn btn-outline-secondary page" type="button">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Modal -->
+    <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/admin/service/add" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Thêm dịch vụ mới</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.name %}is-invalid{% endif %}" id="name"
+                                name="name" placeholder="service Name" value="{{ formError.name ?? '' }}" required>
+                            <label for="name">Tên dịch vụ</label>
+                            <div class="invalid-feedback">
+                                {{ errors.name }}
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3 col-6">
+                            <input type="number" class="form-control {% if errors.price %}is-invalid{% endif %}"
+                                id="price" name="price" placeholder="Price (VND)" value="{{ formError.price }}"
+                                required>
+                            <label for="price">Price (VND)</label>
+                            <div class="invalid-feedback">
+                                {{ errors.price }}
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control {% if errors.description %}is-invalid{% endif %}"
+                                name="description" placeholder="Short description" id="description"
+                                style="height: 30px" required>{{ formError.description }}</textarea>
+                            <label for="description">Short description</label>
+                            <div class="invalid-feedback">
+                                {{ errors.description }}
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteForm" action="/admin/service/delete" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xóa dịch vụ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Xóa tên dịch vụ: <span id="modal-servicename"></span></p>
+                        <input type="hidden" name="service_id" id="modal-service-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('exampleModal');
+        const modal = new bootstrap.Modal(modalElement);
+        const btn_deleteservice = document.querySelectorAll(".delete-service");
+
+        btn_deleteservice.forEach(button => {
+            button.addEventListener('click', () => {
+                const servicename = button.getAttribute('data-servicename');
+                const serviceId = button.getAttribute('data-id');
+
+                document.getElementById('modal-servicename').textContent = servicename;
+                document.getElementById('modal-service-id').value = serviceId;
+            });
+        });
+
+        const pageButton = document.querySelector('.page');
+        const pageInput = document.querySelector('.page-input');
+
+        pageButton.addEventListener('click', () => {
+            let fullLink = window.location.href;
+            const url = new URL(fullLink);
+            let pageNum = pageInput.value;
+            if (pageNum < 0 || pageNum === '' || pageNum === null || pageNum === ' ') {
+                pageNum = 1;
+            }
+            url.searchParams.set('page', pageNum);
+            window.location.href = url.href;
+        });
+
+        let fullLink = window.location.href;
+        let url = new URL(fullLink);
+        if (url.searchParams.has('page')) {
+            let pageValue = url.searchParams.get('page');
+            pageInput.value = pageValue;
+        }
+    });
+
+</script>
+{% if isOpenModal %}
+<script>
+
+    const modal1 = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    modal1.show();
+
+</script>
+{% endif %}
+{% endblock %}

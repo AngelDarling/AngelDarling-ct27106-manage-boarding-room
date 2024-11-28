@@ -1,0 +1,56 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<section class="container mt-5">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card text-bg-success">
+                <div class="card-header">Tổng người dùng</div>
+                <div class="card-body">
+                    <h5 class="card-title">Tổng số tài khoản</h5>
+                    <p class="card-text fs-1">{{ total_users }} tài khoản</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-bg-warning">
+                <div class="card-header">Hợp đồng</div>
+                <div class="card-body">
+                    <h5 class="card-title">Số hợp đồng chờ duyệt</h5>
+                    <p class="card-text fs-1 text-danger">{{ pending_contracts }} hợp đồng</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-bg-info">
+                <div class="card-header">Tổng số phòng</div>
+                <div class="card-body">
+                    <h5 class="card-title">Số phòng hiện có</h5>
+                    <p class="card-text fs-1 text-danger">{{ totalRooms }} phòng</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-bg-success">
+                <div class="card-header">Tổng số phòng</div>
+                <div class="card-body">
+                    <h5 class="card-title">Số phòng còn trống</h5>
+                    <p class="card-text fs-1">{{ totalRooms_Controng }} phòng</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-bg-info">
+                <div class="card-header">Tổng số phòng</div>
+                <div class="card-body">
+                    <h5 class="card-title">Số phòng đã đặt</h5>
+                    <p class="card-text fs-1 text-danger">{{ totalRooms_Dadat }} phòng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

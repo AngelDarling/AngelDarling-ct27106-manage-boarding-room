@@ -1,0 +1,57 @@
+<!-- Footer -->
+<footer class="bg-dark text-white py-4"> <!-- Màu nền dark, chữ trắng, padding trên dưới mức 4 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="logo-footer">
+                    <img src="/assets/img/logo-footer.jpg" alt="Logo Footer">
+                </div>
+                <p><i class="fa-solid fa-location-dot"></i> Hẻm 2 Đường 3/2, Phường Hưng Lợi, Quận Ninh Kiều, Tp Cần Thơ
+                </p>
+                <p><i class="fa-solid fa-phone"></i> 0 123 456789</p>
+                <p><i class="fa-solid fa-envelope"></i> phongtrocantho@gmail.com</p>
+            </div>
+            <div class="col-md-3">
+                <h5>PHÒNG TRỌ MỚI</h5>
+                <ul class="list-unstyled">
+                    {% for room in latestrooms %}
+                    <li class="room-item" onclick="window.location.href='/sanpham/{{ room.id }}'">
+                        <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}"
+                            class="card-img-top" alt="{{ room.name | e }}">
+                        <div class="room-detail">
+                            <a href="#">{{ room.name | e }}</a>
+                            <span>{{ room.price | number_format(0, ',', '.') }} đ</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>TIN MỚI</h5>
+                <ul class="news">
+                    <li>
+                        <a href="#">Số lượng sinh viên tăng cao, các phòng trọ chật kín chỗ</a>
+                    </li>
+                    <li>
+                        <a href="#">Những lưu ý khi tìm trọ tại Cần Thơ</a>
+                    </li>
+                </ul>
+                <h3 style="font-size: 17px; color: #fff; font-weight: bold;">NHẬN BẢN TIN TỪ CHÚNG TÔI</h3>
+                <form action="" method="post">
+                    <input type="email" name="email-footer" placeholder="Email của bạn">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit">Gửi</button>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <h5>FANPAGE FACEBOOK</h5>
+                <div class="fb-page" data-href="https://www.facebook.com/vieclamcantho.com.vn?locale=vi_VN" data-tabs="timeline"
+                    data-width="270" data-height="130" data-small-header="false" data-adapt-container-width="true"
+                    data-hide-cover="false" data-show-facepile="true">
+                    <blockquote cite="https://www.facebook.com/vieclamcantho.com.vn?locale=vi_VN" class="fb-xfbml-parse-ignore">
+                        <a href="https://www.facebook.com/vieclamcantho.com.vn?locale=vi_VN">Tìm trọ Cần Thơ</a></blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

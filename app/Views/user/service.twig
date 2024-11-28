@@ -1,0 +1,108 @@
+{% set title = "Giới thiệu về nhà trọ" %}
+{% set css_file = "service" %}  {# Chỉ định file CSS cho trang này #}
+{% include 'user/header.twig' %}
+
+ <!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered" aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/type_room">Loại phòng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" style="color: #e0bf7b; border-bottom: 3px solid #e0bf7b">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="service">
+    <div class="container">
+        <div class="title-service">
+            <h3>Dịch vụ của chúng tôi</h3>    
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-building"></i>
+                <h3>Các phòng cho thuê</h3>
+                <p>Chúng tôi cung cấp các phòng cho thuê với đầy đủ tiện nghi, thích hợp cho cả sinh viên và người đi làm. Mỗi phòng đều được trang bị giường, bàn làm việc, tủ quần áo và điều hòa.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-bed"></i>
+                <h3>Tiện ích đầy đủ</h3>
+                <p>Nhà trọ cung cấp các tiện ích như Wi-Fi miễn phí, dịch vụ giặt là, và phòng sinh hoạt chung cho cư dân. Đảm bảo mang lại trải nghiệm thoải mái nhất cho khách thuê.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-phone-alt"></i>
+                <h3>Hỗ trợ 24/7</h3>
+                <p>Đội ngũ quản lý của chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc, từ các yêu cầu liên quan đến phòng ở cho đến các dịch vụ tiện ích khác.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-location-arrow"></i>
+                <h3>Vị trí thuận tiện</h3>
+                <p>Nhà trọ của chúng tôi nằm ở vị trí thuận lợi, gần các trung tâm mua sắm, trường học và các khu vực giao thông công cộng, giúp bạn tiết kiệm thời gian di chuyển.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chính sách thuê phòng -->
+<section class="chinhsachthuephong">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>CHÍNH SÁCH THUÊ PHÒNG</h3>
+                <p class="p2">
+                    1. Thời gian thuê:
+                    <br>
+                    Phòng có thể thuê theo tháng hoặc theo năm, với mức giá hợp lý cho từng loại phòng. Chúng tôi cũng cung cấp các gói thuê dài hạn với mức giá ưu đãi.
+                </p>
+                <p class="p2">
+                    2. Các tiện ích kèm theo:
+                    <br>
+                    Tất cả các phòng đều được trang bị đầy đủ nội thất, bao gồm giường, tủ, bàn làm việc, và điều hòa. Bên cạnh đó, chúng tôi cũng cung cấp các dịch vụ như Wi-Fi miễn phí, dọn dẹp phòng, và giặt là.
+                </p>
+                <p class="p2">
+                    3. Quy định thuê phòng:
+                    <br>
+                    Để thuê phòng tại nhà trọ, khách hàng cần có hợp đồng rõ ràng, giấy tờ tùy thân và đặt cọc trước. Chính sách hủy phòng sẽ áp dụng theo thỏa thuận trong hợp đồng.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p class="p2">
+                    4. Điều kiện và phí thanh toán:
+                    <br>
+                    Khách hàng cần thanh toán đầy đủ tiền thuê phòng theo kỳ hạn đã đăng ký. Phí thanh toán có thể thanh toán qua chuyển khoản ngân hàng hoặc thanh toán trực tiếp.
+                </p>
+                <p class="p2">
+                    5. Chính sách bảo vệ tài sản:
+                    <br>
+                    Chúng tôi cam kết bảo vệ tài sản của khách hàng trong suốt thời gian lưu trú tại nhà trọ. Tuy nhiên, khách hàng cần tự bảo quản tài sản cá nhân trong phòng.
+                </p>
+                <p class="p2">
+                    6. Điều kiện để gia hạn hợp đồng:
+                    <br>
+                    Sau khi hết hạn thuê, khách hàng có thể gia hạn hợp đồng thuê phòng nếu có nhu cầu. Việc gia hạn sẽ được thực hiện theo các thỏa thuận trong hợp đồng ban đầu.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'user/footer.twig' %}
+
+</body>
+</html>

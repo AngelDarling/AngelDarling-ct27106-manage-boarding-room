@@ -1,0 +1,55 @@
+main {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-top: 160px;
+}
+
+h1 {
+    margin-top: 30px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #916841;
+}
+
+.page-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.breadcrumb-item {
+    font-weight: bold;
+}
+
+.breadcrumb-item a {
+    font-weight: normal;
+}
+
+.breadcrumb-item > a {
+    text-decoration: none;
+    color: rgba(102, 102, 102, 0.7);
+    
+}
+
+#content .card {
+    margin-bottom: 30px;
+    border: none;
+}
+
+#content .card-body {
+    text-align: center;
+}
+
+#content .card-text {
+    font-weight: bold;
+    pointer-events: none;
+}
+
+#content .card img {
+    max-height: 250px;
+}
+
+#content .card-title:hover, p:hover {
+    color: #916841;
+    cursor: pointer;
+}

@@ -1,0 +1,145 @@
+{% include 'user/header.twig' %}
+
+<!-- Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered" aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse bg-light" id="navbarCentered">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/" style="color: #e0bf7b; border-bottom: 3px solid #e0bf7b">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/type_room">Loại phòng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/new_room">Phòng mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/service">Dịch vụ</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Slider Section -->
+<section id="slider">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/assets/img/pexels-fotoaibe-1571453.jpg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="/assets/img/pexels-juanpphotoandvideo-877971.jpg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="/assets/img/pexels-jvdm-1457842.jpg" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<!-- New rooms Section -->
+<section class="rooms my-5">
+    <div class="container">
+        <h2 class="text-center">PHÒNG TRỌ MỚI</h2>
+        <div class="row">
+            {% for room in rooms %}
+                <div class="col-md-4 mb-4">
+                    <div class="card" onclick="window.location.href='/sanpham/{{ room.id }}'">
+                        <img src="/assets/uploads/rooms/{{ room.image ? room.image | e : 'images.jpg' }}" class="card-img-top" alt="{{ room.name | e }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ room.name | e }}</h5>
+                            <p class="card-text">{{ room.type_room | e }}</p>
+                            <p class="card-text">Giá: {{ room.price | number_format(0, ',', '.') }} đ</p>
+                            <span class="sp_moi">MỚI</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a href="/watch" class="button-full-room d-flex justify-content-center">
+            <span>XEM TẤT CẢ PHÒNG TRỌ MỚI</span>
+        </a>
+    </div>
+</section>
+
+<!-- Dich vu cua chung toi -->
+<section class="service">
+    <div class="container">
+        <div class="title-service">
+            <h3>Dịch vụ của chúng tôi</h3>    
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-building"></i>
+                <h3>Các phòng cho thuê</h3>
+                <p>Chúng tôi cung cấp các phòng cho thuê với đầy đủ tiện nghi, thích hợp cho cả sinh viên và người đi làm. Mỗi phòng đều được trang bị giường, bàn làm việc, tủ quần áo và điều hòa.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-bed"></i>
+                <h3>Tiện ích đầy đủ</h3>
+                <p>Nhà trọ cung cấp các tiện ích như Wi-Fi miễn phí, dịch vụ giặt là, và phòng sinh hoạt chung cho cư dân. Đảm bảo mang lại trải nghiệm thoải mái nhất cho khách thuê.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-phone-alt"></i>
+                <h3>Hỗ trợ 24/7</h3>
+                <p>Đội ngũ quản lý của chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc, từ các yêu cầu liên quan đến phòng ở cho đến các dịch vụ tiện ích khác.</p>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-location-arrow"></i>
+                <h3>Vị trí thuận tiện</h3>
+                <p>Nhà trọ của chúng tôi nằm ở vị trí thuận lợi, gần các trung tâm mua sắm, trường học và các khu vực giao thông công cộng, giúp bạn tiết kiệm thời gian di chuyển.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chinh sach bao hanh -->
+<section class="chinhsachthuephong">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>CÁCH THỨC ĐẶT PHÒNG VÀ CHÍNH SÁCH</h3>
+                <p class="p2">
+                    1. Thời gian thuê:
+                    <br>
+                    Phòng có thể thuê theo tháng hoặc theo năm, với mức giá hợp lý cho từng loại phòng. Chúng tôi cũng cung cấp các gói thuê dài hạn với mức giá ưu đãi.
+                </p>
+                <p class="p2">
+                    2. Các tiện ích kèm theo:
+                    <br>
+                    Tất cả các phòng đều được trang bị đầy đủ nội thất, bao gồm giường, tủ, bàn làm việc, và điều hòa. Bên cạnh đó, chúng tôi cũng cung cấp các dịch vụ như Wi-Fi miễn phí, dọn dẹp phòng, và giặt là.
+                </p>
+                <p class="p2">
+                    3. Quy định thuê phòng:
+                    <br>
+                    <a href="service">Xem chi tiết</a>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/Ruu3uL1KSnk" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'user/footer.twig' %}

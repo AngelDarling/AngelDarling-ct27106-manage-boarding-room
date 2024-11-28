@@ -1,0 +1,240 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống quản lí phòng trọ</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #dfdfdf;
+        }
+
+        #sidebar {
+            background: #6d6d6d;
+            min-height: 100vh;
+            color: white;
+            transition: all 0.3s;
+            overflow-y: scroll;
+            top: 0;
+            height: 100vh;
+        }
+
+        #sidebar ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        #sidebar .sidebar-header {
+            background: #333333;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        #sidebar .active {
+            margin-left: 0;
+            background-color: #7386D5;
+        }
+
+        #sidebar ul li a {
+            display: block;
+            padding: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: white;
+            color: #7386D5;
+        }
+
+        .content {
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Sidebar toggle button on smaller screens */
+        @media (max-width: 992px) {
+            #sidebar {
+                margin-left: -250px;
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+
+            #sidebarCollapse {
+                display: block;
+            }
+        }
+
+        /* Show sidebar and hide button on larger screens */
+        @media (min-width: 992px) {
+            #sidebarCollapse {
+                display: none;
+            }
+
+            #sidebar {
+                margin-left: 0;
+            }
+        }
+
+        .avatar {
+            vertical-align: middle;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        main.container>.d-flex {
+            gap: 50px;
+        }
+
+        .form-control {
+            min-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper d-flex">
+
+        <nav id="sidebar" class="col-lg-3 col-md-4 position-sticky">
+
+            <div class="sidebar-header" onclick="window.location.replace(`{{appURL}}/admin/tenant`);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-house"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
+                </svg>
+                <h3>Cập nhật người thuê</h3>
+            </div>
+            <ul class="list-unstyled components">
+
+                {% for b in listTenant %}
+                <li class="{{ b.id == tenant.id ? 'active' : '' }}">
+                    <a href="/admin/tenant/update?id={{ b.id }}">{{ b.name }}</a>  {# Cần sửa chỗ này#}
+                </li>
+                {% endfor %}
+            </ul>
+
+        </nav>
+
+        <div class="content flex-grow-1">
+            <nav class="navbar navbar-light">
+                <!-- Sidebar Toggle Button -->
+                <button type="button" id="sidebarCollapse" class="btn btn-info d-lg-none">
+                    <i class="fa fa-align-justify"></i>
+                </button>
+            </nav>
+            <div style="margin-top: 10vh;">
+                <main class="container">
+                    <div class="d-flex justify-content-center">
+                        <div
+                            class="p-5 col-8 rounded bg-white d-flex justify-content-center align-items-center flex-column">
+                            <form action="/admin/tenant/update" method="post" enctype="multipart/form-data">
+                                <div class="">
+                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Cập nhật người thuê</h1>
+                                </div>
+                                <div class="">
+                                    <!-- Tên người thuê -->
+                                    <div class="form-floating mb-3">
+                                        <input type="hidden" name="id" value="{{tenant.id}}">
+                                        <input type="text" class="form-control {% if errors.name %}is-invalid{% endif %}" id="name" name="name" placeholder="Tên người thuê" value="{{ tenant.name }}" required>
+                                        <label for="name">Tên người thuê</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.name }}
+                                        </div>
+                                    </div>
+                            
+                                    <!-- Email người thuê -->
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control {% if errors.email %}is-invalid{% endif %}" id="email" name="email" placeholder="Email" value="{{ tenant.email }}" required>
+                                        <label for="email">Email</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.email }}
+                                        </div>
+                                    </div>
+                            
+                                    <!-- Địa chỉ người thuê -->
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control {% if errors.address %}is-invalid{% endif %}" id="address" name="address" placeholder="Địa chỉ" value="{{ tenant.address }}" required>
+                                        <label for="address">Địa chỉ</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.address }}
+                                        </div>
+                                    </div>
+                            
+                                    <!-- Số điện thoại người thuê -->
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control {% if errors.phone %}is-invalid{% endif %}" id="phone" name="phone" placeholder="Số điện thoại" value="{{ tenant.phone }}" required>
+                                        <label for="phone">Số điện thoại</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.phone }}
+                                        </div>
+                                    </div>
+                            
+                                    <!-- CCCD người thuê -->
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control {% if errors.cccd %}is-invalid{% endif %}" id="cccd" name="cccd" placeholder="CCCD" value="{{ tenant.cccd }}" required>
+                                        <label for="cccd">CCCD</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.cccd }}
+                                        </div>
+                                    </div>
+                            
+                                    <!-- CSRF Token -->
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="tenant_id" value="{{ tenant.id }}">
+                                </div>
+                            
+                                <div class="">
+                                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                                </div>
+                            </form>
+                            
+
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    });
+</script>
+{% if status %}
+<script>
+    Toastify({
+        text: "{{ status }}",
+        className: "info",
+        duration: 3000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "right",
+        style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)"
+        }
+    }).showToast();
+</script>
+{% endif %}
+<script src="/assets/js/previewImgae.js" defer></script>
+
+</html>

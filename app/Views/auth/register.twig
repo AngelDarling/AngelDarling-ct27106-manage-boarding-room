@@ -1,0 +1,127 @@
+{% extends "layouts/default.twig" %}
+{% block page %}
+
+<div class="container">
+  <h1 class="text-center mt-3 mb-3">Hệ thống quản lí phòng trọ</h1>
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-8 col-lg-6">
+
+      <!-- Hiển thị thông báo thành công -->
+      {% if messages.success is defined %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ messages.success | e }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+
+      <!-- Hiển thị lỗi đăng ký -->
+      {% if errors.register is defined %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ errors.register | e }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="/register" enctype="multipart/form-data" class="card"
+        style="border-width: 3px; border-color: rgb(198, 236, 255);">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="card-header" style="background-color: rgb(198, 236, 255);">
+          <h3 class="card-title" style="color: rgb(6, 147, 254);">Đăng ký</h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-3 row">
+            <label for="name" class="col-sm-3 col-form-label"><b>Tên:</b> </label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control {{ errors.name is defined ? 'is-invalid' : '' }}" id="name"
+                placeholder="Nhập tên của bạn" name="name" value="{{ old.name | e }}" required autofocus>
+              {% if errors.name is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.name | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="email" class="col-sm-3 col-form-label"><b>Email:</b> </label>
+            <div class="col-sm-8">
+              <input type="email" class="form-control {{ errors.email is defined ? 'is-invalid' : '' }}" id="email"
+                placeholder="Nhập vào email" name="email" value="{{ old.email | e }}" required>
+              {% if errors.email is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.email | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="avatar" class="col-sm-3 col-form-label"><b>Avatar:</b> </label>
+            <div class="col-sm-8">
+              <input type="file" class="form-control {{ errors.avatar is defined ? 'is-invalid' : '' }}" id="avatar"
+                name="avatar" accept="image/*">
+              {% if errors.avatar is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.avatar | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="gender" class="col-sm-3 col-form-label"><b>Giới tính:</b> </label>
+            <div class="col-sm-8">
+              <select class="form-select {{ errors.gender is defined ? 'is-invalid' : '' }}" id="gender" name="gender"
+                required>
+                <option value="" disabled selected>Chọn giới tính</option>
+                <option value="male" {{ old.gender=='male' ? 'selected' : '' }}>Nam</option>
+                <option value="female" {{ old.gender=='female' ? 'selected' : '' }}>Nữ</option>
+              </select>
+              {% if errors.gender is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.gender | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="password" class="col-sm-3 col-form-label"><b>Mật khẩu:</b> </label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control {{ errors.password is defined ? 'is-invalid' : '' }}"
+                id="password" placeholder="Nhập vào mật khẩu" name="password" required>
+              {% if errors.password is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.password | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="password-confirm" class="col-sm-3 col-form-label"><b>Nhập lại mật khẩu:</b> </label>
+            <div class="col-sm-8">
+              <input type="password"
+                class="form-control {{ errors.password_confirmation is defined ? 'is-invalid' : '' }}"
+                id="password-confirm" placeholder="Xác nhận mật khẩu" name="password_confirmation" required>
+              {% if errors.password_confirmation is defined %}
+              <span class="invalid-feedback">
+                <strong>{{ errors.password_confirmation | e }}</strong>
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="col-sm-8 offset-sm-3">
+            <button type="submit" class="btn btn-primary mt-2">Đăng ký</button>
+            <a class="btn btn-link" href="/login">
+              Bạn đã có tài khoản?
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

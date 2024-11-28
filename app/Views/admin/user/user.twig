@@ -1,0 +1,288 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<div class="mt-5 container">
+	<div class="d-flex justify-content-between">
+		<h1>Quản lí người dùng</h1>
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+			Thêm người dùng mới
+		</button>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="col-8 offset-2">
+			<div class="input-group">
+				<div class="input-group-btn search-panel">
+					<button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+						aria-expanded="false">
+						<span id="search_concept">Lọc theo</span>
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li>
+							<a class="dropdown-item filter" data-filter="admin">Quản lí</a>
+						</li>
+						<li>
+							<a class="dropdown-item filter" data-filter="user">Khách thuê trọ</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider filter">
+						</li>
+						<li>
+							<a class="dropdown-item filter" data-filter="anything">Tất cả</a>
+						</li>
+					</ul>
+				</div>
+
+				<input type="text" id="search-bar" class="form-control" placeholder="Hãy nhập tên người dùng cần tìm">
+				<button class="btn btn-outline-secondary" type="button" id="search-button">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+						class="bi bi-search" viewbox="0 0 16 16">
+						<path
+							d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+					</svg>
+				</button>
+
+			</div>
+		</div>
+	</div>
+	<table class="table table-hover my-4">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Id</th>
+				<th scope="col">Name</th>
+				<th scope="col">Email</th>
+				<th scope="col">Role</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		{% for user in users %}
+		<tr>
+			<th scope="row">{{ loop.index+(paginator.currentPage-1)*10 }}</th>
+			<th scope="row">{{ user.id }}</th>
+			<td>{{ user.name }}</td>
+			<td>{{ user.email }}</td>
+			<td>{{ user.role }}</td>
+			<td>
+				<a class="btn btn-secondary" href="/admin/user/detail?id={{ user.id }}">Detail</a>
+				<a class="btn btn-warning mx-2" href="/admin/user/update?id={{ user.id }}">Update</a>
+				<button class="btn btn-danger delete-user" data-bs-toggle="modal" data-bs-target="#exampleModal"
+					data-username="{{ user.name }}" data-id="{{ user.id }}">Delete</button>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<nav aria-label="Page navigation">
+		<div class="d-flex justify-content-center gap-4">
+			<div>
+				<ul class="pagination d-flex justify-content-center">
+					<li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+						<a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+							<span>&laquo;</span>
+						</a>
+					</li>
+					{% for page in paginator.pages %}
+					<li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+						<a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+					</li>
+					{% endfor %}
+					<li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+						<a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+							<span>&raquo;</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="col-2">
+				<div class="input-group">
+					<input type="number" class="form-control page-input" placeholder="Nhập số trang">
+					<button class="btn btn-outline-secondary page" type="button">
+						<i class="bi bi-list-ol"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<!-- Modal -->
+	<div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+		tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="/admin/user/add" method="post" enctype="multipart/form-data">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">Add new user</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="form-floating mb-3">
+							<input type="email" class="form-control {% if errors.email %}is-invalid{% endif %}"
+								id="email" name="email" placeholder="name@example.com" value="{{ formError.email }}"
+								required>
+							<label for="email">Email address</label>
+							<div class="invalid-feedback">
+								{{ errors.email }}
+							</div>
+						</div>
+						<div class="form-floating mb-3">
+							<input type="password" class="form-control {% if errors.password %}is-invalid{% endif %}"
+								id="password" name="password" placeholder="Password" required>
+							<label for="password">Password</label>
+							<div class="invalid-feedback">
+								{{ errors.password }}
+							</div>
+						</div>
+						<div class="form-floating mb-3">
+							<input type="password"
+								class="form-control {% if errors.confirm_password %}is-invalid{% endif %}"
+								id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+							<label for="confirm_password">Confirm Password</label>
+							<div class="invalid-feedback">
+								{{ errors.confirm_password }}
+							</div>
+						</div>
+						<div class="form-floating mb-3">
+							<input type="text" class="form-control {% if errors.name %}is-invalid{% endif %}" id="name"
+								name="name" placeholder="Name" value="{{ formError.name ?? '' }}" required>
+							<label for="name">Name</label>
+							<div class="invalid-feedback">
+								{{ errors.name }}
+							</div>
+						</div>
+						<div class="form-floating mb-3">
+							<select class="form-select" id="gender" name="gender"
+								aria-label="Floating label select example" required>
+								<option value="male" selected>MALE</option>
+								<option value="female">FEMALE</option>
+							</select>
+							<label for="gender">Gender</label>
+						</div>
+						<div class="form-floating mb-3">
+							<select class="form-select" id="role" name="role" aria-label="Floating label select example"
+								required>
+								<option value="USER" selected>USER</option>
+								<option value="ADMIN">ADMIN</option>
+							</select>
+							<label for="role">Role</label>
+						</div>
+						<div class="mb-3">
+							<label for="formFile" class="form-label">Avatar</label>
+							<input accept="image/png, image/gif, image/jpeg" class="form-control file-input" type="file"
+								id="formFile" name="avatar">
+						</div>
+						<div style="border-style: dashed !important; height: 20vh;"
+							class="mb-3 w-100 border border-secondary d-flex justify-content-center">
+							<div class="previewDivImage position-relative"></div>
+						</div>
+						<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Add</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="deleteForm" action="/admin/user/delete" method="post">
+					<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+					<div class="modal-header">
+						<h5 class="modal-title">Modal delete</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Delete user name: <span id="modal-username"></span></p>
+						<input type="hidden" name="user_id" id="modal-user-id">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-danger">Delete</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	const modalElement = document.getElementById('exampleModal');
+	const modal = new bootstrap.Modal(modalElement);
+	const btn_deleteUser = document.querySelectorAll(".delete-user");
+	btn_deleteUser.forEach(button => {
+		button.addEventListener('click', () => {
+			const username = button.getAttribute('data-username');
+			const userId = button.getAttribute('data-id');
+
+			document.getElementById('modal-username').textContent = username;
+			document.getElementById('modal-user-id').value = userId;
+		});
+	});
+	// /
+
+	const getSearchValue = () => {
+		return document.getElementById('search-bar').value;
+	}
+	const searchButton = document.getElementById('search-button')
+	searchButton.addEventListener('click', () => {
+		let fullLink = window.location.href;
+		const url = new URL(fullLink);
+		if (getSearchValue() === '' || getSearchValue() === null) {
+			url.searchParams.delete('search')
+			window.location.href = url
+		} else {
+			url.searchParams.set('search', getSearchValue());
+			window.location.href = url
+		}
+
+	});
+	const dropdown = document.querySelectorAll(".filter");
+	dropdown.forEach((item) => {
+		item.addEventListener('click', (e) => {
+			let fullLink = window.location.href;
+			const url = new URL(fullLink);
+			if (item.getAttribute('data-filter') === 'anything') {
+				url.searchParams.delete('filterBy')
+				window.location.href = url
+			} else {
+				url.searchParams.set('filterBy', (item.getAttribute('data-filter')));
+				window.location.href = url
+			}
+		})
+	})
+	const pageButton = document.querySelector('.page');
+	const pageInput = document.querySelector('.page-input');
+	pageButton.addEventListener('click', () => {
+		let fullLink = window.location.href;
+		const url = new URL(fullLink);
+		let pageNum = pageInput.value;
+		if (pageNum < 0 || pageNum === '' || pageNum === null || pageNum === ' ') {
+			pageNum = 1;
+		}
+		url.searchParams.set('page', pageNum)
+		window.location.href = url
+	})
+	///tu dong them vao input
+	let fullLink = window.location.href;
+	let url = new URL(fullLink);
+	if (url.searchParams.has('page')) {
+		let pageValue = url.searchParams.get('page');
+		pageInput.value = pageValue;
+	}
+	if (url.searchParams.has('search')) {
+		let pageValue = url.searchParams.get('search');
+		document.getElementById('search-bar').value = pageValue;
+	}
+
+</script>
+{% if isOpenModal %}
+<script>
+
+	const modal1 = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+	modal1.show();
+
+</script>
+{% endif %}
+{% endblock %}
