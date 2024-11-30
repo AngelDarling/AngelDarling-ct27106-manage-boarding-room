@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\room; // Import model room
 
-class WatchController extends Controller
+class roomController extends Controller
 {
     public function index()
     {
@@ -23,7 +23,7 @@ class WatchController extends Controller
             'latestrooms' => $latestrooms,
             'user' => $user,
         ];
-        $this->sendPage('user/watch.twig', $data);
+        $this->sendPage('user/room.twig', $data);
     }
 
     public function show($id)
@@ -56,6 +56,6 @@ class WatchController extends Controller
             'latestrooms' => $latestrooms,
         ];
 
-        $this->sendPage('user/watch.twig', $data);
+        $this->sendPage('user/room.twig', $data);
     }
 }

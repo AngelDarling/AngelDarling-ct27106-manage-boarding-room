@@ -78,17 +78,30 @@ class room
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
     // Lấy nhiều sản phẩm theo các ID
-    public function getroomsByIds(array $ids)
-    {
-        if (empty($ids)) {
-            return [];
-        }
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $stmt = $this->pdo->prepare("SELECT * FROM rooms WHERE id IN ($placeholders)");
-        $stmt->execute($ids);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function getRoomsByIds($roomIds)
+{
+    // Kiểm tra xem mảng roomIds có dữ liệu hay không
+    if (empty($roomIds)) {
+        return []; // Trả về mảng rỗng nếu không có roomIds
     }
+
+    // Chuyển mảng roomIds thành mảng các tham số placeholder ? (prepared statement)
+    $placeholders = implode(',', array_fill(0, count($roomIds), '?'));
+
+    // Tạo câu truy vấn SQL với các tham số placeholder
+    $sql = "SELECT * FROM rooms WHERE id IN ($placeholders)";
+
+    // Chuẩn bị câu truy vấn
+    $statement = $this->pdo->prepare($sql);
+
+    // Thực thi câu truy vấn, truyền các giá trị vào các tham số placeholder
+    $statement->execute(array_map('intval', $roomIds));
+
+    // Trả về kết quả truy vấn
+    return $statement->fetchAll();
+}
 
 
     // Admin
@@ -306,7 +319,7 @@ class room
 
         return $row ? $row['name'] : null;
     }
-    
+
     public function getTotalRooms(): int
     {
         $statement = $this->pdo->prepare('SELECT COUNT(*) FROM rooms');
@@ -315,14 +328,14 @@ class room
     }
 
     public function getTotalRooms_Controng(): int
-{
-    // Sửa lỗi cú pháp trong SQL: phải dùng dấu nháy đơn bên ngoài chuỗi
-    $statement = $this->pdo->prepare("SELECT COUNT(*) FROM rooms WHERE status = 'Còn trống'");
-    $statement->execute();
-    
-    // Trả về kết quả dưới dạng số nguyên
-    return (int) $statement->fetchColumn();
-}
+    {
+        // Sửa lỗi cú pháp trong SQL: phải dùng dấu nháy đơn bên ngoài chuỗi
+        $statement = $this->pdo->prepare("SELECT COUNT(*) FROM rooms WHERE status = 'Còn trống'");
+        $statement->execute();
+
+        // Trả về kết quả dưới dạng số nguyên
+        return (int) $statement->fetchColumn();
+    }
 
 
     public function getTotalRooms_Dadat(): int
@@ -334,12 +347,27 @@ class room
 
     public function updateRoomStatus($roomId, $status)
     {
+        // Truy vấn để cập nhật trạng thái phòng
         $sql = "UPDATE rooms SET status = :status WHERE id = :roomId";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':status' => $status,
-            ':roomId' => $roomId,
-        ]);
-        return $stmt->rowCount() > 0;
+        $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+        $stmt->bindParam(':roomId', $roomId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+
+    public function getNameByRoomId($RoomId)
+    {
+        $sql = "SELECT name FROM rooms WHERE id = :roomId";
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindParam(':roomId', $RoomId, PDO::PARAM_INT);  // Bind tham số vào câu truy vấn
+        $statement->execute();
+        // Kiểm tra nếu có kết quả trả về
+        if ($statement->rowCount() > 0) {
+            return $statement->fetchColumn();  // Trả về tên phòng
+        } else {
+            return null;  // Nếu không tìm thấy, trả về null
+        }
     }
 }

@@ -25,6 +25,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 //CSRF
 
+
+
+// Đặt thời gian timeout là 5 phút (300 giây)
+define('SESSION_TIMEOUT', 20);
+
+// Kiểm tra nếu người dùng đã đăng nhập
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    // Lấy thời gian hiện tại
+    $current_time = time();
+
+    // Kiểm tra thời gian hoạt động cuối cùng
+    if (isset($_SESSION['last_activity']) && ($current_time - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+        // Nếu thời gian không hoạt động vượt quá 5 phút, hủy session
+        session_unset();
+        session_destroy();
+        // Chuyển hướng về trang đăng nhập
+        redirect('/login');
+    }
+
+    // Cập nhật lại thời gian hoạt động cuối cùng
+    $_SESSION['last_activity'] = $current_time;
+}
+
+
 require_once __DIR__ . '/../vendor/autoload.php'; // Autoload các thư viện cần thiết
 
 // Định nghĩa thư mục chứa các template
@@ -48,8 +72,8 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     // Các route khác...
     $r->addRoute('GET', '/type_room', ['\App\Controllers\type_roomController', 'index']);
     $r->addRoute('GET', '/new_room', ['\App\Controllers\new_roomController', 'index']);
-    $r->addRoute('GET', '/watch', ['\App\Controllers\WatchController', 'index']);
-    $r->addRoute('GET', '/watch/{id:\d+}', ['\App\Controllers\WatchController', 'show']); // Sử dụng số cho id
+    $r->addRoute('GET', '/room', ['\App\Controllers\roomController', 'index']);
+    $r->addRoute('GET', '/room/{id:\d+}', ['\App\Controllers\roomController', 'show']); // Sử dụng số cho id
     $r->addRoute('GET', '/service', ['\App\Controllers\ServiceController', 'index']);
     $r->addRoute('GET', '/sanpham/{id:\d+}', ['\App\Controllers\SanphamController', 'show']); // Sử dụng số cho id
     $r->addRoute('GET', '/profile', ['\App\Controllers\profileController', 'index']);
@@ -65,9 +89,17 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('POST', '/thanhtoan', ['\App\Controllers\ThanhtoanController', 'confirm']);
     $r->addRoute('GET', '/thanhtoan_success', ['\App\Controllers\Thanhtoan_successController', 'success']);
 
-
-
+    $r->addRoute('POST', '/maintenance-request', ['\App\Controllers\ProfileController', 'submitMaintenanceRequest']);
     
+    // Đánh giá routes
+    $r->addRoute('GET', '/reviews', ['\App\Controllers\ReviewController', 'index']); // Trang danh sách đánh giá của người dùng
+    $r->addRoute('POST', '/review/store', ['\App\Controllers\ReviewController', 'submitReview']); // Xử lý tạo đánh giá mới
+    $r->addRoute('POST', '/review/{id}/delete', ['\App\Controllers\ReviewController', 'deleteReview']); // Xử lý xóa đánh giá
+
+    $r->addRoute('GET', '/profile/{id:\d+}', ['\App\Controllers\profileController', 'viewNotifications']);
+
+
+
     // Admin routes
     $r->addRoute('GET', '/admin/dashboard', ['\App\Controllers\Admin\DashboardController', 'getIndex']);
 
@@ -104,6 +136,13 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('POST', '/admin/service/update', ['\App\Controllers\Admin\serviceController', 'update']);
     $r->addRoute('POST', '/admin/service/delete', ['\App\Controllers\Admin\serviceController', 'deleteservice']);
 
+
+    $r->addRoute('GET', '/admin/notification', ['\App\Controllers\Admin\notificationController', 'getnotifications']);
+    $r->addRoute('GET', '/admin/notification/update', ['\App\Controllers\Admin\notificationController', 'getUpdatenotification']);
+    $r->addRoute('POST', '/admin/notification/add', ['\App\Controllers\Admin\notificationController', 'addnotification']);
+    $r->addRoute('POST', '/admin/notification/update', ['\App\Controllers\Admin\notificationController', 'update']);
+    $r->addRoute('POST', '/admin/notification/delete', ['\App\Controllers\Admin\notificationController', 'deletenotification']);
+
     
     $r->addRoute('GET', '/admin/tenant', ['\App\Controllers\Admin\TenantController', 'getTenant']);
     $r->addRoute('GET', '/admin/tenant/update', ['\App\Controllers\Admin\tenantController', 'getUpdatetenant']);
@@ -114,6 +153,12 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('POST', '/admin/user/update-avatar', ['\App\Controllers\Admin\UserController', 'updateAvatar']);
     $r->addRoute('POST', '/admin/user/update/{id:\d+}', ['\App\Controllers\Admin\UserController', 'updateUser']);
     $r->addRoute('POST', '/admin/user/delete/{id:\d+}', ['\App\Controllers\Admin\UserController', 'deleteUser']);
+
+    $r->addRoute('GET', '/admin/maintenance_request', ['\App\Controllers\Admin\maintenance_requestController', 'getmaintenance_request']);
+    $r->addRoute('POST', '/admin/maintenance_request/delete', ['\App\Controllers\Admin\maintenance_requestController', 'deletemaintenance_request']);
+    $r->addRoute('POST', '/admin/maintenance_request/update-status', ['\App\Controllers\Admin\maintenance_requestController', 'updatemaintenance_requestStatus']);
+
+
 });
 
 $adminRoutes = [

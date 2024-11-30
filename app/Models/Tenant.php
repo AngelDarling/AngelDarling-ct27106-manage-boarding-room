@@ -203,4 +203,28 @@ class Tenant
         $statement->execute();
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getTenantsByContractId(int $contractId): array
+{
+    $stmt = $this->pdo->prepare("
+        SELECT t.* 
+        FROM tenants t
+        JOIN ky_ket k ON t.id = k.id_tenant
+        WHERE k.id_contract = :contractId
+    ");
+    $stmt->execute(['contractId' => $contractId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC); // Trả về danh sách tenants
+}
+
+
+public function getEmailsByTenantIds($tenantIds)
+{
+    $ids = implode(',', $tenantIds); // Chuyển mảng tenantIds thành chuỗi ngăn cách bằng dấu phẩy
+    $sql = "SELECT email FROM tenants WHERE id IN ($ids)";
+    $statement = $this->pdo->prepare($sql);
+    $statement->execute();
+    return $statement->fetchAll(PDO::FETCH_COLUMN); // Trả về mảng chứa email của tenants
+}
+
 }

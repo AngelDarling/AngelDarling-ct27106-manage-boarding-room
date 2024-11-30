@@ -29,7 +29,16 @@
     </div>
 </nav>
 
+
 <main>
+    {% if success_message is defined and success_message is not empty %}
+<div id="success-alert" class="alert alert-success alert-dismissible fade show text-center" role="alert">
+    {{ success_message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+
     {% block page %}
     <div class="container mt-5">
         <h1 class="mb-4 d-flex justify-content-center">Thông tin cá nhân</h1>
@@ -37,9 +46,9 @@
         <!-- Thông tin cá nhân -->
         <div class="card mb-4">
             <div class="card-body">
-                <h3 class="card-title">{{ user.name }}</h3>
+                <h3 class="card-title text-uppercase">{{ user.name }}</h3>
                 <p class="card-text">Email: {{ user.email }}</p>
-                <p class="card-text">Ngày tham gia: {{ user.created_at }}</p>
+                <p class="card-text">Họ và tên: {{ user.name }}</p>
             </div>
         </div>
 
@@ -51,7 +60,36 @@
             <div class="card-body">
                 <ul class="list-group">
                     {% for room in rooms %}
-                    <li class="list-group-item">{{ room.name }} - {{ room.status }}</li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ room.name }} - {{ room.status }}</span>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#maintenanceModal{{ room.id }}">Yêu cầu bảo trì</button>
+        
+                        <!-- Modal nhập thông tin yêu cầu bảo trì -->
+                        <div class="modal fade" id="maintenanceModal{{ room.id }}" tabindex="-1" aria-labelledby="maintenanceModalLabel{{ room.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="maintenanceModalLabel{{ room.id }}">Yêu cầu bảo trì cho phòng {{ room.name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/maintenance-request" method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <div class="mb-3">
+                                                <label for="description" class="form-label">Mô tả yêu cầu:</label>
+                                                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                            </div>
+                                            <input type="hidden" name="room_id" value="{{ room.id }}">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <div class="mb-3">
+                                                <button type="submit" class="btn btn-primary">Gửi yêu cầu</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
                     {% else %}
                     <li class="list-group-item">Không có phòng đã đặt</li>
                     {% endfor %}
@@ -60,20 +98,43 @@
         </div>
 
         <!-- Tenant -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h4>Tenant</h4>
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Người thuê</h4>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for tenant in tenants %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>{{ tenant.name }} - {{ tenant.email }} - {{ tenant.phone }} - {{ tenant.address }} - {{ tenant.cccd }}</span>
+                <button class="btn btn-info btn-sm view-notifications" data-tenant-id="{{ tenant.id }}">Xem thông báo</button>
+            </li>
+            {% else %}
+            <li class="list-group-item">Không có tenant</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<!-- Modal to display notifications -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationsModalLabel">Thông báo của Người Thuê</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for tenant in tenants %}
-                    <li class="list-group-item">{{ tenant.name }} - {{ tenant.status }}</li>
-                    {% else %}
-                    <li class="list-group-item">Không có tenant</li>
-                    {% endfor %}
+            <div class="modal-body">
+                <ul id="notificationsList" class="list-group">
+                    <!-- Notifications will be dynamically inserted here -->
                 </ul>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
         </div>
+    </div>
+</div>
+
 
         <!-- Hợp đồng -->
         <div class="card mb-4">
@@ -83,7 +144,20 @@
             <div class="card-body">
                 <ul class="list-group">
                     {% for contract in contracts %}
-                    <li class="list-group-item">{{ contract.id }} - {{ contract.status }} - {{ contract.total_amount }}</li>
+                    <li class="list-group-item">
+                        {{ contract.id }} - {{ contract.status }} - {{ contract.total_amount }} - {{ contract.rooms_name }}
+                        <br>
+                        <strong>Tenant Emails:</strong>
+                        {% if contract.tenant_emails is not empty %}
+                            <ul>
+                                {% for email in contract.tenant_emails %}
+                                    <li>{{ email }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Không có tenant</p>
+                        {% endif %}
+                    </li>
                     {% else %}
                     <li class="list-group-item">Không có hợp đồng</li>
                     {% endfor %}
@@ -111,9 +185,62 @@
     {% endblock %}
 </main>
 
+<script>
+    // Tự động ẩn thông báo sau 5 giây (5000 ms)
+    setTimeout(() => {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            setTimeout(() => {
+                alert.remove(); // Xóa phần tử khỏi DOM
+            }, 500); // Đợi hiệu ứng mờ hoàn tất (0.5s)
+        }
+    }, 5000); // 5 giây
 
 
 
+    document.addEventListener('DOMContentLoaded', function () {
+    const viewNotificationButtons = document.querySelectorAll('.view-notifications');
+
+    viewNotificationButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const tenantId = button.getAttribute('data-tenant-id');
+            
+            // Gửi yêu cầu AJAX để lấy thông báo của người thuê
+            fetch(`/admin/notifications/${tenantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Hiển thị thông báo trong modal
+                    const notificationsList = document.getElementById('notificationsList');
+                    notificationsList.innerHTML = ''; // Clear previous notifications
+                    
+                    if (data.notifications.length > 0) {
+                        data.notifications.forEach(notification => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('list-group-item');
+                            listItem.textContent = notification.content; // Hiển thị nội dung thông báo
+                            notificationsList.appendChild(listItem);
+                        });
+                    } else {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item');
+                        listItem.textContent = 'Không có thông báo nào.';
+                        notificationsList.appendChild(listItem);
+                    }
+                    
+                    // Mở modal
+                    const notificationsModal = new bootstrap.Modal(document.getElementById('notificationsModal'));
+                    notificationsModal.show();
+                })
+                .catch(error => {
+                    console.error('Error fetching notifications:', error);
+                });
+        });
+    });
+});
+
+</script>
 
 {% include 'user/footer.twig' %}
 

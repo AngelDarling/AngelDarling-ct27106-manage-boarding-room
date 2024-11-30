@@ -1,0 +1,167 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<style>
+    .btn {
+        height: 40px; /* Đặt chiều cao đồng nhất */
+        line-height: 1; /* Căn giữa nội dung */
+        display: flex; /* Căn giữa */
+        align-items: center; /* Căn giữa */
+    }
+</style>
+
+<div class="mt-5 container">
+    <div class="d-flex justify-content-between">
+        <h1>Quản lý yêu cầu bảo trì</h1>
+    </div>
+    <hr />
+
+    <!-- Bảng hiển thị danh sách yêu cầu bảo trì -->
+    <table class="table table-hover my-4 text-center">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Tên người dùng</th>
+                <th scope="col">Tên phòng</th>
+                <th scope="col">Mô tả</th>
+                <th scope="col">Trạng thái</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in maintenance_requests %}
+            <tr>
+                <th scope="row">{{ request.id }}</th>
+                <td>{{ request.user_name }}</td>
+                <td>{{ request.room_name }}</td>
+                <td>{{ request.description }}</td>
+                <td>
+                    {% if request.status == 'Đã tiếp nhận' %}
+                    <span class="badge bg-success">Đã tiếp nhận</span>
+                    {% else %}
+                    <span class="badge bg-warning">Chờ duyệt</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                    <form method="POST" action="/admin/maintenance_request/update-status">
+                        <input type="hidden" name="maintenance_request_id" value="{{ request.id }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        {% if request.status != 'Đã tiếp nhận' %}
+                        <button type="submit" class="btn btn-success">Duyệt</button>
+                    {% endif %}
+                    </form>
+                    <button class="btn btn-danger delete-maintenance_request mx-2" data-bs-toggle="modal" 
+                        data-bs-target="#exampleModal" data-maintenance_requestname="{{ request.room_name }}" 
+                        data-id="{{ request.id }}">Xóa
+                    </button>
+                </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-center gap-4">
+            <div>
+                <ul class="pagination d-flex justify-content-center">
+                    <li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page in paginator.pages %}
+                    <li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+                        <a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <input type="number" class="form-control page-input" placeholder="Nhập số trang">
+                    <button class="btn btn-outline-secondary page" type="button">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal xóa yêu cầu bảo trì -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteForm" action="/admin/maintenance_request/delete" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xóa yêu cầu bảo trì</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Xóa yêu cầu bảo trì của phòng này <span id="modal-maintenance_requestname"></span>?</p>
+                        <input type="hidden" name="maintenance_request_id" id="modal-maintenance_request-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('exampleModal');
+        const modal = new bootstrap.Modal(modalElement);
+        const btn_deletemaintenance_request = document.querySelectorAll(".delete-maintenance_request");
+
+        btn_deletemaintenance_request.forEach(button => {
+            button.addEventListener('click', () => {
+                const maintenance_requestname = button.getAttribute('data-maintenance_requestname');
+                const maintenance_requestId = button.getAttribute('data-id');
+
+                document.getElementById('modal-maintenance_requestname').textContent = maintenance_requestname;
+                document.getElementById('modal-maintenance_request-id').value = maintenance_requestId;
+            });
+        });
+
+        const pageButton = document.querySelector('.page');
+        const pageInput = document.querySelector('.page-input');
+
+        pageButton.addEventListener('click', () => {
+            let fullLink = window.location.href;
+            const url = new URL(fullLink);
+            let pageNum = pageInput.value;
+            if (pageNum < 1 || pageNum === '' || pageNum === null || pageNum === ' ') {
+                pageNum = 1;
+            }
+            url.searchParams.set('page', pageNum);
+            window.location.href = url.href;
+        });
+
+        let fullLink = window.location.href;
+        let url = new URL(fullLink);
+        if (url.searchParams.has('page')) {
+            let pageValue = url.searchParams.get('page');
+            pageInput.value = pageValue;
+        }
+    });
+</script>
+
+{% if isOpenModal %}
+<script>
+    const modal1 = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    modal1.show();
+</script>
+{% endif %}
+{% endblock %}

@@ -41,7 +41,21 @@
                     <div class="row">
                         <div class="col-xl-9">
                             <ul class="list-unstyled">
-                                <li class="text-muted">Tenant: <span style="color:#5d9fc5;">{{ contract.tenant_name }}</span></li>
+                                {% if contract.tenants is not empty %}
+            {% for tenant in contract.tenants %}
+                <li>
+                    <span class="text-muted">Name:</span> <strong>{{ tenant.name | default('N/A') }}</strong>
+                    {% if tenant.email %}
+                        (<span class="text-muted">Email:</span> {{ tenant.email }})
+                    {% endif %}
+                    {% if tenant.phone %}
+                        - <span class="text-muted">Phone:</span> {{ tenant.phone }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No tenants found for this contract.</li>
+        {% endif %}
                                 <li class="text-muted">Room: <span style="color:#5d9fc5;">{{ contract.room_name }}</span></li>
                                 <li class="text-muted">Start Date: {{ contract.start_date }}</li>
                                 <li class="text-muted">End Date: {{ contract.end_date }}</li>
@@ -52,8 +66,6 @@
                             <ul class="list-unstyled">
                                 <li class="text-muted"><i class="bi bi-circle-fill" style="color:#84B0CA;"></i> <span
                                         class="fw-bold">ID:</span> #{{ contract.id }}</li>
-                                <li class="text-muted"><i class="bi bi-circle-fill" style="color:#84B0CA;"></i> <span
-                                        class="fw-bold">Creation Date:</span> {{ contract.created_at }}</li>
                                 <li class="text-muted"><i class="bi bi-circle-fill" style="color:#84B0CA;"></i> <span
                                         class="me-1 fw-bold">Status:</span><span
                                         class="badge bg-{{ contract.status_color }} text-white fw-bold">{{ contract.status }}</span></li>

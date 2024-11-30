@@ -111,50 +111,52 @@ class ContractController extends Controller
     }
 
     public function viewInvoice()
-    {
-        $contractId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+{
+    $contractId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-        if ($contractId > 0) {
-            $contractModel = new Contract(PDO());
-            $tenantModel = new Tenant(PDO());
-            $roomModel = new Room(PDO());
-            $contract = $contractModel->getContractById($contractId);
+    if ($contractId > 0) {
+        $contractModel = new Contract(PDO());
+        $tenantModel = new Tenant(PDO());
+        $roomModel = new Room(PDO());
 
-            $services = [];
-            $services = $contractModel->getServicesByContractId($contractId) ?: [];
-        
-            if ($contract) {
-                $tenant = $tenantModel->getTenantById($contract->id_tenants);
-                $room = $roomModel->getRoomByIdRoom($contract->id_room);
+        $contract = $contractModel->getContractById($contractId);
+        $services = $contractModel->getServicesByContractId($contractId) ?: [];
 
-                $statusColors = [
-                    'PENDING' => 'warning',
-                    'PROCESSING' => 'info',
-                    'DONE' => 'success',
-                    'CANCELLED' => 'danger'
-                ];
+        if ($contract) {
+            // Lấy danh sách tenant liên quan đến hợp đồng từ bảng `ky_ket`
+            $tenants = $tenantModel->getTenantsByContractId($contractId);
 
-                $contractData = [
-                    'id' => $contract->id,
-                    'tenant_name' => $tenant['name'],
-                    'room_name' => $room['name'],
-                    'start_date' => $contract->start_date,
-                    'end_date' => $contract->end_date,
-                    'total_amount' => $contract->total_amount,
-                    'deposit' => $contract->deposit,
-                    'balance' => $contract->total_amount - $contract->deposit,
-                    'status' => $contract->status,
-                    'status_color' => $statusColors[$contract->status] ?? 'secondary',
-                    'services' => $services
-                ];
+            $room = $roomModel->getRoomByIdRoom($contract->id_room);
 
-                // Return contract data to the view
-                $this->sendPage('admin/contract/detail', ['contract' => $contractData]);
-            } else {
-                redirect('/admin/order', ['status' => 'Invalid order ID']);
-            }
+            $statusColors = [
+                'PENDING' => 'warning',
+                'PROCESSING' => 'info',
+                'DONE' => 'success',
+                'CANCELLED' => 'danger'
+            ];
+
+            $contractData = [
+                'id' => $contract->id,
+                'tenants' => $tenants, // Danh sách tenant
+                'room_name' => $room['name'],
+                'start_date' => $contract->start_date,
+                'end_date' => $contract->end_date,
+                'total_amount' => $contract->total_amount,
+                'deposit' => $contract->deposit,
+                'balance' => $contract->total_amount - $contract->deposit,
+                'status' => $contract->status,
+                'status_color' => $statusColors[$contract->status] ?? 'secondary',
+                'services' => $services
+            ];
+
+            // Trả về dữ liệu hợp đồng tới view
+            $this->sendPage('admin/contract/detail', ['contract' => $contractData]);
         } else {
-            redirect('/admin/order', ['status' => 'Invalid order ID']);
+            redirect('/admin/contract', ['status' => 'ID hợp đồng không hợp lệ']);
         }
+    } else {
+        redirect('/admin/contract', ['status' => 'ID hợp đồng không hợp lệ']);
     }
+}
+
 }

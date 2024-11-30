@@ -1,0 +1,196 @@
+{% extends "/admin/layouts/default.twig" %}
+{% block page %}
+<div class="mt-5 container">
+    <div class="d-flex justify-content-between">
+        <h1>Quản lý thông báo</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Thêm thông báo mới
+        </button>
+    </div>
+    <hr />
+
+    <table class="table table-hover my-4 text-center">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">ID Người thuê</th>
+                <th scope="col">Nội dung</th>
+                <th scope="col">Loại thông báo</th>
+                <th scope="col">Ngày tạo</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        {% for notification in notifications %}
+        <tr>
+            <th scope="row">{{ notification.id }}</th>
+            <td>{{ notification.id_tenants }}</td>
+            <td>{{ notification.content }}</td>
+            <td>{{ notification.type }}</td>
+            <td>{{ notification.created_at }}</td>
+            <td>
+                <a class="btn btn-warning mx-2" href="/admin/notification/update?id={{ notification.id }}">Sửa</a>
+                <button class="btn btn-danger delete-notification" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                    data-content="{{ notification.content }}" data-id="{{ notification.id }}">Xóa</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-center gap-4">
+            <div>
+                <ul class="pagination d-flex justify-content-center">
+                    <li class="page-item{{ paginator.getPrevPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getPrevPage) }}" class="page-link">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page in paginator.pages %}
+                    <li class="page-item{{ paginator.currentPage == page ? ' active' : '' }}">
+                        <a role="button" href="{{ url_with_params('page', page) }}" class="page-link">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item{{ paginator.getNextPage() ? '' : ' disabled' }}">
+                        <a role="button" href="{{ url_with_params('page', paginator.getNextPage) }}" class="page-link">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <input type="number" class="form-control page-input" placeholder="Nhập số trang">
+                    <button class="btn btn-outline-secondary page" type="button">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Modal -->
+    <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/admin/notification/add" method="post">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Thêm thông báo mới</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-floating mb-3">
+                            <select class="form-select {% if errors.id_tenants %}is-invalid{% endif %}" id="id_tenants" name="id_tenants" required>
+                                <option value="" disabled selected>Chọn người thuê</option>
+                                {% for tenant in tenant %}
+                                    <option value="{{ tenant.id }}" {% if tenant.id == formError.id_tenants %}selected{% endif %}>
+                                        {{ tenant.name }} (ID: {{ tenant.id }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_tenants">Người thuê</label>
+                            <div class="invalid-feedback">
+                                {{ errors.id_tenants }}
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control {% if errors.content %}is-invalid{% endif %}"
+                                name="content" placeholder="Nội dung thông báo" id="content"
+                                style="height: 100px" required>{{ formError.content }}</textarea>
+                            <label for="content">Nội dung thông báo</label>
+                            <div class="invalid-feedback">
+                                {{ errors.content }}
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select class="form-select {% if errors.type %}is-invalid{% endif %}" id="type" name="type" required>
+                                <option value="" disabled selected>Chọn loại thông báo</option>
+                                <option value="Tiền trọ" {% if formError.type == 'Tiền trọ' %}selected{% endif %}>Tiền trọ</option>
+                                <option value="Vi phạm" {% if formError.type == 'Vi phạm' %}selected{% endif %}>Vi phạm</option>
+                            </select>
+                            <label for="type">Loại thông báo</label>
+                            <div class="invalid-feedback">
+                                {{ errors.type }}
+                            </div>
+                        </div>
+                        
+                        
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteForm" action="/admin/notification/delete" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xóa thông báo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Xóa nội dung thông báo: <span id="modal-content"></span></p>
+                        <input type="hidden" name="notification_id" id="modal-notification-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('exampleModal');
+        const btn_deleteNotification = document.querySelectorAll(".delete-notification");
+
+        btn_deleteNotification.forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.getAttribute('data-content');
+                const notificationId = button.getAttribute('data-id');
+
+                document.getElementById('modal-content').textContent = content;
+                document.getElementById('modal-notification-id').value = notificationId;
+            });
+        });
+
+        const pageButton = document.querySelector('.page');
+        const pageInput = document.querySelector('.page-input');
+
+        pageButton.addEventListener('click', () => {
+            let fullLink = window.location.href;
+            const url = new URL(fullLink);
+            let pageNum = pageInput.value;
+            if (pageNum < 0 || pageNum === '' || pageNum === null || pageNum === ' ') {
+                pageNum = 1;
+            }
+            url.searchParams.set('page', pageNum);
+            window.location.href = url.href;
+        });
+
+        let fullLink = window.location.href;
+        let url = new URL(fullLink);
+        if (url.searchParams.has('page')) {
+            let pageValue = url.searchParams.get('page');
+            pageInput.value = pageValue;
+        }
+    });
+
+</script>
+{% if isOpenModal %}
+<script>
+    const modal1 = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    modal1.show();
+</script>
+{% endif %}
+{% endblock %}

@@ -54,9 +54,21 @@
             {% for contract in contracts %}
             <tr>
                 <th scope="row">{{ contract.id }}</th>
-                <td>{{ contract.tenant_email }}</td>
+                
+                <!-- Hiển thị danh sách email của các tenant -->
+                <td>
+                    {% if contract.tenants is not empty %}
+                        <ul class="list-unstyled mb-0">
+                            {% for tenant in contract.tenants %}
+                                <li>{{ tenant.email }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">No tenants available</span>
+                    {% endif %}
+                </td>
+        
                 <td>{{ contract.room_name }}</td>
-
                 <td>{{ contract.start_date }}</td>
                 <td>{{ contract.end_date }}</td>
                 <td>{{ contract.total_amount }} VND</td>
@@ -108,6 +120,7 @@
             </tr>
             {% endfor %}
         </tbody>
+        
     </table>
     <nav aria-label="Page navigation">
         <div class="d-flex justify-content-center gap-4">

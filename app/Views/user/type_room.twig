@@ -40,7 +40,7 @@
         <div class="row">
             {% for type_room in type_rooms %}
             <div class="phantu col-6 col-md-3 text-center mb-4">
-                <a href="/watch/{{ type_room.id }}">
+                <a href="/room/{{ type_room.id }}">
                     <img src="/assets/uploads/type_rooms/{{ type_room.image ? type_room.image | e : 'type_room.jpg' }}"
                         alt="{{ type_room.name | e }}">
                 </a>

@@ -8,6 +8,7 @@ use App\Models\room;
 use App\Controllers\Controller;
 use App\Models\tenant;
 use App\Models\Lienket;
+use App\Models\Kyket;
 
 class ThanhtoanController extends Controller
 {
@@ -55,97 +56,92 @@ class ThanhtoanController extends Controller
             redirect('/login');
         }
 
-        // Kiểm tra các trường nhập từ người dùng
-        $name = $_POST['name'] ?? null;
-        if (!$name) {
-            $_SESSION['error'] = 'Vui lòng nhập họ và tên';
-            redirect('/thanhtoan');
-        }
-
-        $email = $_POST['email'] ?? null;
-        if (!$email) {
-            $_SESSION['error'] = 'Vui lòng nhập email';
-            redirect('/thanhtoan');
-        }
-
-        $address = $_POST['address'] ?? null;
-        if (!$address) {
-            $_SESSION['error'] = 'Vui lòng nhập địa chỉ giao hàng';
-            redirect('/thanhtoan');
-        }
-
-        $phone = $_POST['phone'] ?? null;
-        if (!$phone) {
-            $_SESSION['error'] = 'Vui lòng nhập số điện thoại';
-            redirect('/thanhtoan');
-        }
-
-        $cccd = $_POST['cccd'] ?? null;
-        if (!$cccd) {
-            $_SESSION['error'] = 'Vui lòng nhập căn cước công dân';
-            redirect('/thanhtoan');
-        }
-
+        // Kiểm tra và lấy thông tin từ form
+        $tenants = $_POST['tenants'] ?? null; // Mảng chứa danh sách người thuê
         $startDate = $_POST['start_date'] ?? null;
         $endDate = $_POST['end_date'] ?? null;
         $deposit = $_POST['deposit'] ?? null;
 
-        if (!$startDate || !$endDate || !$deposit) {
-            $_SESSION['error'] = 'Vui lòng nhập đầy đủ thông tin ngày và tiền cọc';
+        // Kiểm tra các trường thông tin chính
+        if (!$tenants || !$startDate || !$endDate || !$deposit) {
+            $_SESSION['error'] = 'Vui lòng nhập đầy đủ thông tin người thuê, ngày thuê và tiền cọc';
             redirect('/thanhtoan');
         }
 
-        // Tạo đối tượng Tenant và lưu vào cơ sở dữ liệu
-        $tenantModel = new Tenant(PDO());
-        $tenantId = $tenantModel->createTenant($name, $email, $address, $phone, $cccd, $userId);
-
-        if (!$tenantId) {
-            $_SESSION['error'] = 'Lỗi lưu thông tin người thuê. Vui lòng thử lại!';
-            redirect('/thanhtoan');
-        }
-
-        // Kiểm tra giỏ hàng và tính tổng giá trị đơn hàng
+        // Kiểm tra giỏ hàng
         $rooms = $_SESSION['cart'] ?? null;
         if (!$rooms) {
-            $_SESSION['error'] = 'Giỏ hàng trống. Vui lòng thử lại!';
+            $_SESSION['error'] = 'Giỏ hàng trống. Vui lòng thêm phòng trước khi thanh toán!';
             redirect('/thanhtoan');
         }
 
         $totalPrice = 0;
         $roomId = null;
         $services = []; // Mảng chứa các dịch vụ đã chọn cho phòng
+
+        // Tính toán tổng giá trị đơn hàng
         foreach ($rooms as $roomId => $room) {
-            // Tính tổng giá trị phòng
             $totalPrice += $room['price'];
 
-            // Tính tổng giá dịch vụ (nếu có)
             if (isset($room['services'])) {
                 foreach ($room['services'] as $service) {
                     $totalPrice += $service['price'];
-                    $services[] += $service['id']; // Giả sử mỗi dịch vụ có trường 'id'
+                    $services[] = $service['id']; // Lưu ID dịch vụ
                 }
             }
         }
 
-        // Lưu hợp đồng mới cho phòng trong giỏ hàng
+        // Lưu thông tin hợp đồng
         $contractModel = new Contract(PDO());
-        $contractId = $contractModel->createContract($tenantId, $roomId, $totalPrice, $startDate, $endDate, $deposit);
+        $contractId = $contractModel->createContract($roomId, $totalPrice, $startDate, $endDate, $deposit);
 
-        if ($contractId) {
-            $lienKetModel = new LienKet(PDO());
-            $lienKetModel->addServicesToContract($contractId, $services);
-
-            $roomModel = new room(PDO());
-            $roomModel->updateRoomStatus($roomId, 'Chờ duyệt');
-
-            // Xóa giỏ hàng sau khi thanh toán
-            unset($_SESSION['cart']);
-
-            $_SESSION['message'] = 'Đặt phòng thành công! Hợp đồng đã được tạo.';
-            redirect('/thanhtoan_success');
+        if (!$contractId) {
+            $_SESSION['error'] = 'Lỗi tạo hợp đồng. Vui lòng thử lại!';
+            redirect('/thanhtoan');
         }
 
-        $_SESSION['error'] = 'Lỗi đặt phòng. Vui lòng thử lại!';
-        redirect('/thanhtoan');
+        // Lưu thông tin từng người thuê và liên kết với hợp đồng
+        $tenantModel = new Tenant(PDO());
+        $kyKetModel = new KyKet(PDO());
+
+        // Liên kết dịch vụ với hợp đồng
+        $lienKetModel = new LienKet(PDO());
+        $lienKetModel->addServicesToContract($contractId, $services);
+
+        // Cập nhật trạng thái phòng
+        $roomModel = new Room(PDO());
+        $roomModel->updateRoomStatus($roomId, 'Chờ duyệt');
+        foreach ($tenants as $tenant) {
+            $name = $tenant['name'] ?? null;
+            $email = $tenant['email'] ?? null;
+            $address = $tenant['address'] ?? null;
+            $phone = $tenant['phone'] ?? null;
+            $cccd = $tenant['cccd'] ?? null;
+
+            // Kiểm tra thông tin người thuê
+            if (!$name || !$email || !$address || !$phone || !$cccd) {
+                $_SESSION['error'] = 'Vui lòng nhập đầy đủ thông tin cho tất cả người thuê!';
+                redirect('/thanhtoan');
+            }
+
+            // Lưu thông tin người thuê vào cơ sở dữ liệu
+            $tenantId = $tenantModel->createTenant($name, $email, $address, $phone, $cccd, $userId);
+
+            if (!$tenantId) {
+                $_SESSION['error'] = 'Lỗi lưu thông tin người thuê. Vui lòng thử lại!';
+                redirect('/thanhtoan');
+            }
+
+            // Liên kết người thuê với hợp đồng trong bảng trung gian
+            $kyKetModel->addTenantToContract($contractId, $tenantId);
+        }
+
+        
+
+        // Xóa giỏ hàng sau khi thanh toán
+        unset($_SESSION['cart']);
+
+        $_SESSION['message'] = 'Đặt phòng thành công! Hợp đồng đã được tạo.';
+        redirect('/thanhtoan_success');
     }
 }

@@ -91,3 +91,20 @@ main {
     background-color: #e0bf7b;
     color: #fff;
 }
+
+/* Màn overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    z-index: 999; /* Đảm bảo overlay phủ lên trên */
+    display: none;
+}
+
+/* Nếu muốn thay đổi chiều rộng của modal */
+.modal-dialog {
+    max-width: 500px; /* Điều chỉnh chiều rộng tối đa của modal */
+}
